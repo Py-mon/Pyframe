@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from pyframe.screen.grid.matrix import Junction
+from pyframe.mat import Junction
 from pyframe.types_ import Direction, JunctionDict, Thickness
 
 

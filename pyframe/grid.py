@@ -108,8 +108,8 @@ class Junction(Cell):
     def __add__(self, junction: Self) -> Self:
         return type(self)(self.dct | junction.dct, junction.color)
 
-    # def __mul__(self, times: int) -> tuple[Self, ...]:
-    #     return tuple(Junction(self.dct, self.color) for _ in range(times))
+    def __mul__(self, times: int) -> list[Self]:
+        return [type(self)(self.dct, self.color) for _ in range(times)]
 
 
 def add_positions(*tups: tuple[int, int]):
@@ -270,9 +270,7 @@ class Grid:
                 print(new_cells[i - start_y], self._cells[i][start_x : stop_x + 1])
                 # self._cells[start_y : stop_y + 1][i][start_x : stop_x + 1] = new_cells[
                 #     i - start_y
-                self._cells[i][start_x : stop_x + 1] = new_cells[
-                    i - start_y
-                ]
+                self._cells[i][start_x : stop_x + 1] = new_cells[i - start_y]
 
             # for i, row in enumerate(self._cells[start_y : stop_y + 1]):
             #     print(new_cells[i], row, row[start_x : stop_x + 1])

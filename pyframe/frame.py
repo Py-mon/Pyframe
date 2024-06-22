@@ -171,27 +171,28 @@ class Frame(Grid):
         """Add a border around the Matrix."""
 
         def many(x, times):
-            return [Junction(x.dct, x.color) for _ in range(times)]
+            return [Junction(x) for _ in range(times)]
 
         top_row = [
-            self.border_type.top_right_junction,
-            *many(self.border_type.horizontal_junction, self.width),
-            self.border_type.top_left_junction,
+            Junction(self.border_type.top_right),
+            *many(self.border_type.top_horizontal, self.width),
+            Junction(self.border_type.top_left),
         ]
 
-        left_column = many(self.border_type.vertical_junction, self.height)
-        right_column = many(self.border_type.vertical_junction, self.height)
+        left_column = many(self.border_type.left_vertical, self.height)
+        right_column = many(self.border_type.right_vertical, self.height)
 
         bottom_row = [
-            self.border_type.bottom_right_junction,
-            *many(self.border_type.horizontal_junction, self.width),
-            self.border_type.bottom_left_junction,
+            Junction(self.border_type.bottom_right),
+            *many(self.border_type.bottom_horizontal, self.width),
+            Junction(self.border_type.bottom_left),
         ]
 
         for i, row in enumerate(self._cells):
             row.insert(0, left_column[i])
             row.append(right_column[i])
 
+        
         self._cells.append(bottom_row)  # type: ignore
         self._cells.insert(0, top_row)  # type: ignore
 

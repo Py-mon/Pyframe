@@ -1,0 +1,162 @@
+{
+    "thick": {
+        "thick": {
+            "thick": {
+                "thick": "╋",
+                "thin": "╉",
+                "none": "┫"
+            },
+            "thin": {
+                "thick": "╊",
+                "thin": "╂",
+                "none": "┨"
+            },
+            "none": {"thick": "┣", "thin": "┠", "none": "┃"}
+        },
+        "thin": {
+            "thick": {
+                "thick": "╇",
+                "thin": "╃",
+                "none": "┩"
+            },
+            "thin": {"thick": "╄", "thin": "╀", "none": "┦"},
+            "none": {"thick": "┡", "thin": "┞", "none": "╿"}
+        },
+        "none": {
+            "thick": {"thick": "┻", "thin": "┹", "none": "┛"},
+            "thin": {"thick": "┺", "thin": "┸", "none": "┚"},
+            "none": {"thick": "┗", "thin": "┖", "none": "╹"}
+        }
+    },
+    "thin": {
+        "thick": {
+            "thick": {
+                "thick": "╈",
+                "thin": "╅",
+                "none": "┪"
+            },
+            "thin": {
+                "thick": "╆",
+                "thin": "╁",
+                "none": "┧"
+            },
+            "none": {"thick": "┢", "thin": "┟", "none": "╽"}
+        },
+        "thin": {
+            "thick": {
+                "thick": "┿",
+                "thin": "┽",
+                "none": "┥"
+            },
+            "thin": {"thick": "┾", "thin": "┼", "none": "┤"},
+            "none": {
+                "thick": "┝",
+                "thin": "├",
+                "none": "│",
+                "double": "╞"
+            },
+            "double": {
+                "none": "╡",
+                "double": "╪"
+            }
+        },
+        "none": {
+            "thick": {"thick": "┷", "thin": "┵", "none": "┙"},
+            "thin": {"thick": "┶", "thin": "┴", "none": "╯"},
+            "none": {
+                "thick": "┕",
+                "thin": "╰",
+                "none": "╵",
+                "double": "╘"
+            },
+            "double": {
+                "none": "╛",
+                "double": "╧"
+            }
+        }
+    },
+    "none": {
+        "thick": {
+            "thick": {
+                "thick": "┳",
+                "thin": "┱",
+                "none": "┓"
+            },
+            "thin": {
+                "thick": "┮",
+                "thin": "┰",
+                "none": "┒"
+            },
+            "none": {"thick": "┏", "thin": "┎", "none": "╻"}
+        },
+        "thin": {
+            "thick": {
+                "thick": "┯",
+                "thin": "┭",
+                "none": "┑"
+            },
+            "thin": {"thick": "┲", "thin": "┬", "none": "╮"},
+            "none": {
+                "thick": "┍",
+                "thin": "╭",
+                "none": "╷",
+                "double": "╒"
+            },
+            "double": {
+                "none": "╕",
+                "double": "╤"
+            }
+        },
+        "none": {
+            "thick": {"thick": "━", "thin": "╾", "none": "╸"},
+            "thin": {"thick": "╼", "thin": "─", "none": "╴"},
+            "none": {
+                "thick": "╺",
+                "thin": "╶"
+            },
+            "double": {"double": "═"}
+        },
+        "double": {
+            "thin": {
+                "thin": "╥",
+                "none": "╖"
+            },
+            "none": {
+                "thin": "╓",
+                "double": "╔"
+            },
+            "double": {
+                "none": "╗",
+                "double": "╦"
+            }
+        }
+    },
+    "double": {
+        "none": {
+            "thin": {
+                "thin": "╨",
+                "none": "╜"
+            },
+            "none": {
+                "thin": "╙",
+                "double": "╚"
+            },
+            "double": {"none": "╝", "double": "╩"}
+        },
+        "double": {
+            "thin": {
+                "thin": "╫",
+                "none": "╢"
+            },
+            "none": {
+                "thin": "╟",
+                "none": "║",
+                "double": "╠"
+            },
+            "double": {
+                "none": "╣",
+                "double": "╬"
+            }
+        }
+    }
+}

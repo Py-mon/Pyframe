@@ -48,9 +48,9 @@ class CardinalDirection(Enum):
 
 
 class Thickness(Enum):
-    THIN = 0
-    THICK = 1
-    DOUBLE = 2
+    THIN = "thin"
+    THICK = "thick"
+    DOUBLE = "double"
 
 
 JunctionDict = dict[Direction, Thickness]

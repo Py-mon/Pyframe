@@ -1,6 +1,4 @@
-from __future__ import annotations
-
-from pyframe.mat import Junction
+from pyframe.grid import Junction
 from pyframe.types_ import Direction, JunctionDict, Thickness
 
 
@@ -52,6 +50,20 @@ class BorderType:
             f"{self.bottom_right_junction}{self.horizontal_junction * 4}{self.bottom_left_junction}\n"
         )
 
+
+def border_type(
+    horizontal: Thickness, vertical
+) -> tuple[
+    JunctionDict, JunctionDict, JunctionDict, JunctionDict, JunctionDict, JunctionDict
+]:
+    return (
+        {Direction.DOWN: vertical, Direction.RIGHT: horizontal},
+        {Direction.DOWN: vertical, Direction.LEFT: horizontal},
+        {Direction.UP: vertical, Direction.RIGHT: horizontal},
+        {Direction.UP: vertical, Direction.LEFT: horizontal},
+        {Direction.LEFT: horizontal, Direction.RIGHT: horizontal},
+        {Direction.UP: vertical, Direction.DOWN: vertical},
+    )
 
 def _uniform(
     thickness: Thickness,

@@ -6,7 +6,7 @@ from typing import Any, Callable, Optional, Self
 from pyframe.border.border_type import Borders, BorderType
 from pyframe.border.junction_table import get_junction
 from pyframe.colors import Color, Colors
-from pyframe.mat import Cell, Grid, Junction, add_int_positions, add_positions
+from pyframe.grid import Cell, Grid, Junction, add_int_positions, add_positions
 from pyframe.types_ import Alignment, Direction, JunctionDict, Level
 
 

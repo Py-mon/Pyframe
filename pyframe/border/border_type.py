@@ -54,21 +54,12 @@ class BorderType:
 
 
 class Border:
-    def mult(
-        self,
-        junction,
-        width,
-    ):
-        if isinstance(junction, list):
-            return [junction[i % len(junction)] for i in range(width)]
-        return junction * width
-
     def __init__(self, border_type: BorderType, height: int, width: int):
         def create_instance(junction):
             if isinstance(junction, dict):
                 return Junction(junction)
             if len(junction) > 1:
-                return [Cell(junction[0]), Cell(junction[1])]
+                return [Cell(x) for x in junction]
             return Cell(junction)
 
         self.top_right = create_instance(border_type.top_right)
@@ -81,9 +72,17 @@ class Border:
         self.bottom_horizontal = create_instance(border_type.bottom_horizontal)
         self.right_vertical = create_instance(border_type.right_vertical)
 
+        def pattern(
+            junction,
+            width,
+        ):
+            if isinstance(junction, list):
+                return [junction[i % len(junction)] for i in range(width)]
+            return junction * width
+
         self.top_row = [
             self.top_right,
-            *self.mult(self.top_horizontal, width),
+            *pattern(self.top_horizontal, width),
             self.top_left,
         ]
         self.left_column = self.left_vertical * height
@@ -91,7 +90,7 @@ class Border:
 
         self.bottom_row = [
             self.bottom_right,
-            *self.mult(self.bottom_horizontal, width),
+            *pattern(self.bottom_horizontal, width),
             self.bottom_left,
         ]
 
@@ -127,7 +126,7 @@ class BorderTypes:
     #
 
     CASTLE = copy(THIN)
-    CASTLE.top_horizontal = "⍽─"
+    CASTLE.top_horizontal = "─⍽─"
 
     class Classic:
         PLUS = BorderType(
@@ -164,6 +163,8 @@ class BorderTypes:
 
 # TODO vector2d, ascii art, more borders
 # ― ⍽ ⎸ ⎹ ␣ ─ ━ │ ┃
+# ┄ ┅ ┆ ┇ ┈ ┉ ┊ ┋╌ ╍ ╎ ╏
+
 
 # DOUBLE and THICK aren't compatible
 # print(

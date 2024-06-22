@@ -18,12 +18,7 @@ class BorderType:
     right_vertical: JunctionDict | str
 
     def __repr__(self) -> str:
-        border = Border(self)
-        return (
-            f"{border.top_right}{str(border.top_horizontal) * 4}{border.top_left}\n"
-            f"{border.left_vertical}    {border.right_vertical}\n"
-            f"{border.bottom_right}{str(border.bottom_horizontal) * 4}{border.bottom_left}\n"
-        )
+        return repr(Border(self))
 
     @classmethod
     def thickness(
@@ -56,46 +51,6 @@ class BorderType:
             right_vertical={Direction.UP: thickness, Direction.DOWN: thickness},
         )
 
-    @classmethod
-    def combine(
-        cls,
-        top_right: Self | JunctionDict | str,
-        top_left: Self | JunctionDict | str,
-        bottom_right: Self | JunctionDict | str,
-        bottom_left: Self | JunctionDict | str,
-        top_horizontal: Self | JunctionDict | str,
-        left_vertical: Self | JunctionDict | str,
-        bottom_horizontal: Self | JunctionDict | str,
-        right_vertical: Self | JunctionDict | str,
-    ):
-        if isinstance(top_right, BorderType):
-            top_right = top_right.top_right
-        if isinstance(top_left, BorderType):
-            top_left = top_left.top_left
-        if isinstance(bottom_right, BorderType):
-            bottom_right = bottom_right.bottom_right
-        if isinstance(bottom_left, BorderType):
-            bottom_left = bottom_left.bottom_left
-        if isinstance(top_horizontal, BorderType):
-            top_horizontal = top_horizontal.top_horizontal
-        if isinstance(left_vertical, BorderType):
-            left_vertical = left_vertical.left_vertical
-        if isinstance(bottom_horizontal, BorderType):
-            bottom_horizontal = bottom_horizontal.bottom_horizontal
-        if isinstance(right_vertical, BorderType):
-            right_vertical = right_vertical.right_vertical
-
-        return cls(
-            top_right=top_right,
-            top_left=top_left,
-            bottom_right=bottom_right,
-            bottom_left=bottom_left,
-            top_horizontal=top_horizontal,
-            left_vertical=left_vertical,
-            bottom_horizontal=bottom_horizontal,
-            right_vertical=right_vertical,
-        )
-
 
 class Border:
     def __init__(self, border_type: BorderType):
@@ -113,6 +68,13 @@ class Border:
         self.left_vertical = create_instance(border_type.left_vertical)
         self.bottom_horizontal = create_instance(border_type.bottom_horizontal)
         self.right_vertical = create_instance(border_type.right_vertical)
+
+    def __repr__(self) -> str:
+        return (
+            f"{self.top_right}{str(self.top_horizontal) * 4}{self.top_left}\n"
+            f"{self.left_vertical}    {self.right_vertical}\n"
+            f"{self.bottom_right}{str(self.bottom_horizontal) * 4}{self.bottom_left}\n"
+        )
 
 
 class BorderTypes:
@@ -136,16 +98,27 @@ class BorderTypes:
     THICK = BorderType.uniform_thickness(Thickness.THICK)
     DOUBLE = BorderType.uniform_thickness(Thickness.DOUBLE)
 
-    CLASSIC = BorderType(
-        "+",
-        "+",
-        "+",
-        "+",
-        "-",
-        "|",
-        "-",
-        "|",
-    )
+    class Classic:
+        CLASSIC = BorderType(
+            top_right="+",
+            top_left="+",
+            bottom_right="+",
+            bottom_left="+",
+            top_horizontal="-",
+            left_vertical="|",
+            bottom_horizontal="-",
+            right_vertical="|",
+        )
+        EQUAL = BorderType(
+            top_right=CLASSIC.top_right,
+            top_left=CLASSIC.top_left,
+            bottom_right=CLASSIC.bottom_right,
+            bottom_left=CLASSIC.bottom_left,
+            top_horizontal="=",
+            left_vertical=CLASSIC.left_vertical,
+            bottom_horizontal="=",
+            right_vertical=CLASSIC.right_vertical,
+        )
 
 
 # DOUBLE and THICK aren't compatible

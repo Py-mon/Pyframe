@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from math import ceil
 from typing import Any, Callable, Optional, Self
 
-from pyframe.border.border_type import Borders, BorderType
+from pyframe.border.border_type import Border, BorderType, BorderTypes
 from pyframe.border.junction_table import get_junction
 from pyframe.colors import Color, Colors
 from pyframe.grid import Cell, Grid, Junction, add_int_positions, add_positions
@@ -61,7 +61,7 @@ class Frame(Grid):
         text: str,
         height: int,
         width: int,
-        border_type: BorderType = Borders.THIN,
+        border_type: BorderType = BorderTypes.THIN,
         alignment: Alignment = Alignment.CENTER,
     ) -> Self:
         """
@@ -74,9 +74,13 @@ class Frame(Grid):
         │          │
         ╰──────────╯
         """
-        frame = cls([[Cell(" ") for _ in range(width)] for _ in range(height)], border_type)
+        frame = cls(
+            [[Cell(" ") for _ in range(width)] for _ in range(height)], border_type
+        )
 
-        aligned_text = Grid([[Cell(cell) for cell in row] for row in text.split("\n")], alignment)
+        aligned_text = Grid(
+            [[Cell(cell) for cell in row] for row in text.split("\n")], alignment
+        )
         slice_ = get_box(frame.size, add_int_positions(aligned_text.size, -1))
 
         frame[slice_] = aligned_text
@@ -88,7 +92,7 @@ class Frame(Grid):
         cls,
         height: int,
         width: int,
-        border_type: BorderType = Borders.THIN,
+        border_type: BorderType = BorderTypes.THIN,
     ) -> Self:
         frame = cls(
             [[Cell(" ") for _ in range(width - 2)] for _ in range(height - 2)],
@@ -102,7 +106,7 @@ class Frame(Grid):
     def __init__(
         self,
         cells: list[list[Cell]],
-        border_type: BorderType = Borders.THIN,
+        border_type: BorderType = BorderTypes.THIN,
     ) -> None:
         super().__init__(cells)
 
@@ -163,7 +167,7 @@ class Frame(Grid):
 
         self[
             (title.level.value, pos - 1) : (title.level.value, pos + len(title.title))
-        ] = matrix # type: ignore
+        ] = matrix  # type: ignore
 
         self.titles.append(title)
 
@@ -171,28 +175,29 @@ class Frame(Grid):
         """Add a border around the Matrix."""
 
         def many(x, times):
-            return [Junction(x) for _ in range(times)]
+            return x * times
+
+        border = Border(self.border_type)
 
         top_row = [
-            Junction(self.border_type.top_right),
-            *many(self.border_type.top_horizontal, self.width),
-            Junction(self.border_type.top_left),
+            border.top_right,
+            *many(border.top_horizontal, self.width),
+            border.top_left,
         ]
 
-        left_column = many(self.border_type.left_vertical, self.height)
-        right_column = many(self.border_type.right_vertical, self.height)
+        left_column = many(border.left_vertical, self.height)
+        right_column = many(border.right_vertical, self.height)
 
         bottom_row = [
-            Junction(self.border_type.bottom_right),
-            *many(self.border_type.bottom_horizontal, self.width),
-            Junction(self.border_type.bottom_left),
+            border.bottom_right,
+            *many(border.bottom_horizontal, self.width),
+            border.bottom_left,
         ]
 
         for i, row in enumerate(self._cells):
             row.insert(0, left_column[i])
             row.append(right_column[i])
 
-        
         self._cells.append(bottom_row)  # type: ignore
         self._cells.insert(0, top_row)  # type: ignore
 
@@ -282,6 +287,7 @@ def get_box(center_of: tuple[int, int], size: tuple[int, int]) -> slice:
             ceil((center_of[1] + size[1]) / 2 - 1),
         ),
     )
+
 
 f = Frame.centered("abcdef\nghij", 4, 10)
 print(f)

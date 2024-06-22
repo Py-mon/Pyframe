@@ -1,3 +1,4 @@
+from copy import copy
 from dataclasses import dataclass
 from typing import Self
 
@@ -17,8 +18,8 @@ class BorderType:
     bottom_horizontal: JunctionDict | str
     right_vertical: JunctionDict | str
 
-    def __repr__(self) -> str:
-        return repr(Border(self))
+    # def __repr__(self) -> str:
+    #     return repr(Border(self, 3, 5))
 
     @classmethod
     def thickness(
@@ -53,10 +54,21 @@ class BorderType:
 
 
 class Border:
-    def __init__(self, border_type: BorderType):
+    def mult(
+        self,
+        junction,
+        width,
+    ):
+        if isinstance(junction, list):
+            return [junction[i % len(junction)] for i in range(width)]
+        return junction * width
+
+    def __init__(self, border_type: BorderType, height: int, width: int):
         def create_instance(junction):
             if isinstance(junction, dict):
                 return Junction(junction)
+            if len(junction) > 1:
+                return [Cell(junction[0]), Cell(junction[1])]
             return Cell(junction)
 
         self.top_right = create_instance(border_type.top_right)
@@ -69,12 +81,26 @@ class Border:
         self.bottom_horizontal = create_instance(border_type.bottom_horizontal)
         self.right_vertical = create_instance(border_type.right_vertical)
 
-    def __repr__(self) -> str:
-        return (
-            f"{self.top_right}{str(self.top_horizontal) * 4}{self.top_left}\n"
-            f"{self.left_vertical}    {self.right_vertical}\n"
-            f"{self.bottom_right}{str(self.bottom_horizontal) * 4}{self.bottom_left}\n"
-        )
+        self.top_row = [
+            self.top_right,
+            *self.mult(self.top_horizontal, width),
+            self.top_left,
+        ]
+        self.left_column = self.left_vertical * height
+        self.right_column = self.right_vertical * height
+
+        self.bottom_row = [
+            self.bottom_right,
+            *self.mult(self.bottom_horizontal, width),
+            self.bottom_left,
+        ]
+
+    # def __repr__(self) -> str:
+    #     return (
+    #         f"{self.top_right}{''.join([str(cell) for cell in self.mult(self.top_horizontal, 4)])}{self.top_left}\n"
+    #         f"{self.left_vertical}    {self.right_vertical}\n"
+    #         f"{self.bottom_right}{str(self.bottom_horizontal) * 4}{self.bottom_left}\n"
+    #     )
 
 
 class BorderTypes:
@@ -98,8 +124,13 @@ class BorderTypes:
     THICK = BorderType.uniform_thickness(Thickness.THICK)
     DOUBLE = BorderType.uniform_thickness(Thickness.DOUBLE)
 
+    #
+
+    CASTLE = copy(THIN)
+    CASTLE.top_horizontal = "⍽─"
+
     class Classic:
-        CLASSIC = BorderType(
+        PLUS = BorderType(
             top_right="+",
             top_left="+",
             bottom_right="+",
@@ -109,17 +140,30 @@ class BorderTypes:
             bottom_horizontal="-",
             right_vertical="|",
         )
-        EQUAL = BorderType(
-            top_right=CLASSIC.top_right,
-            top_left=CLASSIC.top_left,
-            bottom_right=CLASSIC.bottom_right,
-            bottom_left=CLASSIC.bottom_left,
-            top_horizontal="=",
-            left_vertical=CLASSIC.left_vertical,
-            bottom_horizontal="=",
-            right_vertical=CLASSIC.right_vertical,
+        # EQUAL_SIGN = BorderType(
+        #     top_right=PLUS.top_right,
+        #     top_left=PLUS.top_left,
+        #     bottom_right=PLUS.bottom_right,
+        #     bottom_left=PLUS.bottom_left,
+        #     top_horizontal="=",
+        #     left_vertical=PLUS.left_vertical,
+        #     bottom_horizontal="=",
+        #     right_vertical=PLUS.right_vertical,
+        # )
+        UNDERSCORE = BorderType(
+            top_right=" ",
+            top_left=" ",
+            bottom_right="|",
+            bottom_left="|",
+            top_horizontal="_",
+            left_vertical=PLUS.left_vertical,
+            bottom_horizontal="_",
+            right_vertical=PLUS.right_vertical,
         )
 
+
+# TODO vector2d, ascii art, more borders
+# ― ⍽ ⎸ ⎹ ␣ ─ ━ │ ┃
 
 # DOUBLE and THICK aren't compatible
 # print(

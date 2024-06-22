@@ -173,33 +173,14 @@ class Frame(Grid):
 
     def border(self):
         """Add a border around the Matrix."""
-
-        def many(x, times):
-            return x * times
-
-        border = Border(self.border_type)
-
-        top_row = [
-            border.top_right,
-            *many(border.top_horizontal, self.width),
-            border.top_left,
-        ]
-
-        left_column = many(border.left_vertical, self.height)
-        right_column = many(border.right_vertical, self.height)
-
-        bottom_row = [
-            border.bottom_right,
-            *many(border.bottom_horizontal, self.width),
-            border.bottom_left,
-        ]
+        border = Border(self.border_type, self.height, self.width)
 
         for i, row in enumerate(self._cells):
-            row.insert(0, left_column[i])
-            row.append(right_column[i])
+            row.insert(0, border.left_column[i])
+            row.append(border.right_column[i])
 
-        self._cells.append(bottom_row)  # type: ignore
-        self._cells.insert(0, top_row)  # type: ignore
+        self._cells.append(border.bottom_row)  # type: ignore
+        self._cells.insert(0, border.top_row)  # type: ignore
 
         self.height += 2
         self.width += 2
@@ -209,14 +190,6 @@ class Frame(Grid):
             + [(self.height - 1, i) for i in range(self.width)]
             + [(i, 0) for i in range(1, self.height - 1)]
             + [(i, self.width - 1) for i in range(self.height - 1)]
-            # Size(0, self.size.i.width).rect_range()
-            # + Size(self.size.i.height, self.size.i.width).rect_range(
-            #     Coord(self.size.i.height, 0)
-            # )
-            # + Size(self.size.inner.height, 0).rect_range(Coord(1, 0))
-            # + Size(self.size.inner.height, self.size.i.width).rect_range(
-            #     Coord(1, self.size.i.width)
-            # )
         )
 
         for title in self.titles.copy():
@@ -289,7 +262,8 @@ def get_box(center_of: tuple[int, int], size: tuple[int, int]) -> slice:
     )
 
 
-f = Frame.centered("abcdef\nghij", 4, 10)
+f = Frame.centered("abcdef\nghij", 4, 10, BorderTypes.CASTLE)
+print(f.width)
 print(f)
 # f = Frame.box(6, 10)
 # f.add_title(Title("SO", Alignment.CENTER, Colors.BLUE))

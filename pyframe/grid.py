@@ -27,8 +27,8 @@ class Cell:
         value: str,
         color: Color = Colors.DEFAULT,
     ) -> None:
-        if len(value) > 1:
-            raise ValueError("value more than 1 character")
+        # if len(value) > 1:
+        #     raise ValueError("value more than 1 character")
 
         self.value = value
 
@@ -43,8 +43,8 @@ class Cell:
     def __repr__(self) -> str:
         return str(self.value)
 
-    def __len__(self) -> Literal[0]:
-        return 0
+    def __len__(self):
+        return len(self.value)
 
     # @classmethod
     # def from_iter(cls, itr: Iterable) -> tuple[Self, ...]:
@@ -63,8 +63,8 @@ class Cell:
     #         tuple(cls(fill_with) for _ in range(size.width)) for _ in range(size.height)
     #     )
 
-    # def __mul__(self, times: int) -> tuple[Self, ...]:
-    #     return tuple(type(self)(self.value, self.color) for _ in range(times))
+    def __mul__(self, times: int) -> tuple[Self, ...]:
+        return tuple(type(self)(self.value, self.color) for _ in range(times))
 
     # @classmethod
     # def padding(cls, width: int, value=" ") -> tuple[Self, ...]:
@@ -163,10 +163,10 @@ class Grid:
 
         def level_out(rows: list[list[Cell]], alignment: Alignment = Alignment.LEFT):
             """Level out the rows of the matrix making them all the same width."""
-            max_length = max(len(row) for row in rows)
+            max_length = max(sum([len(cell) for cell in row]) for row in rows)
 
             for i, row in enumerate(rows):
-                row_length = len(row)
+                row_length = sum([len(cell) for cell in row])
 
                 if row_length >= max_length:
                     continue
@@ -189,6 +189,8 @@ class Grid:
             self.width = level_out(self._cells, alignment)
         else:
             self.width = 0
+            
+        print(self.width)
 
     @property
     def size(self) -> tuple[int, int]:

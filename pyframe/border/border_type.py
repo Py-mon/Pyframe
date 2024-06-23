@@ -18,9 +18,6 @@ class BorderType:
     bottom_horizontal: JunctionDict | str
     right_vertical: JunctionDict | str
 
-    # def __repr__(self) -> str:
-    #     return repr(Border(self, 3, 5))
-
     @classmethod
     def thickness(
         cls, top: Thickness, bottom: Thickness, left: Thickness, right: Thickness
@@ -52,9 +49,24 @@ class BorderType:
             right_vertical={Direction.UP: thickness, Direction.DOWN: thickness},
         )
 
+    def set_vertical(self, vertical: JunctionDict | str):
+        self.left_vertical = vertical
+        self.right_vertical = vertical
+
+    def set_horizontal(self, horizontal: JunctionDict | str):
+        self.left_horizontal = horizontal
+        self.right_horizontal = horizontal
+
+    def __repr__(self) -> str:
+        return (
+            f"{self.top_right}{str(self.top_horizontal)}{self.top_left}\n"
+            f"{self.left_vertical}    {self.right_vertical}\n"
+            f"{self.bottom_right}{str(self.bottom_horizontal)}{self.bottom_left}\n"
+        )
+
 
 class Border:
-    def __init__(self, border_type: BorderType, height: int, width: int):
+    def __init__(self, border_type: BorderType):
         def create_instance(junction):
             if isinstance(junction, dict):
                 return Junction(junction)
@@ -72,41 +84,12 @@ class Border:
         self.bottom_horizontal = create_instance(border_type.bottom_horizontal)
         self.right_vertical = create_instance(border_type.right_vertical)
 
-        def pattern(
-            junction,
-            width,
-        ):
-            if isinstance(junction, list):
-                return [junction[i % len(junction)] for i in range(width)]
-            return junction * width
-
-        self.top_row = [
-            self.top_right,
-            *pattern(self.top_horizontal, width),
-            self.top_left,
-        ]
-        self.left_column = self.left_vertical * height
-        self.right_column = self.right_vertical * height
-
-        self.bottom_row = [
-            self.bottom_right,
-            *pattern(self.bottom_horizontal, width),
-            self.bottom_left,
-        ]
-
-    # def __repr__(self) -> str:
-    #     return (
-    #         f"{self.top_right}{''.join([str(cell) for cell in self.mult(self.top_horizontal, 4)])}{self.top_left}\n"
-    #         f"{self.left_vertical}    {self.right_vertical}\n"
-    #         f"{self.bottom_right}{str(self.bottom_horizontal) * 4}{self.bottom_left}\n"
-    #     )
-
 
 class BorderTypes:
     """
     ```
     Thin:
-        ╭───╮
+        ╭───╮ # TODO sharp edges
         │   │
         ╰───╯
     Thick:
@@ -123,7 +106,29 @@ class BorderTypes:
     THICK = BorderType.uniform_thickness(Thickness.THICK)
     DOUBLE = BorderType.uniform_thickness(Thickness.DOUBLE)
 
-    #
+    TRIPLE_DASHED = copy(THIN)
+    TRIPLE_DASHED.set_horizontal("┄")
+    TRIPLE_DASHED.set_vertical("┆")
+
+    QUAD_DASHED = copy(THIN)
+    QUAD_DASHED.set_horizontal("┈")
+    QUAD_DASHED.set_vertical("┊")
+
+    DUO_DASHED = copy(THIN)
+    DUO_DASHED.set_horizontal("╌")
+    DUO_DASHED.set_vertical("╎")
+
+    THICK_TRIPLE_DASHED = copy(THICK)
+    THICK_TRIPLE_DASHED.set_horizontal("┅")
+    THICK_TRIPLE_DASHED.set_vertical("┇")
+
+    THICK_QUAD_DASHED = copy(THICK)
+    THICK_QUAD_DASHED.set_horizontal("┉")
+    THICK_QUAD_DASHED.set_vertical("┋")
+
+    THICK_DUO_DASHED = copy(THICK)
+    THICK_DUO_DASHED.set_horizontal("╍")
+    THICK_DUO_DASHED.set_vertical("╏")
 
     CASTLE = copy(THIN)
     CASTLE.top_horizontal = "─⍽─"
@@ -139,16 +144,6 @@ class BorderTypes:
             bottom_horizontal="-",
             right_vertical="|",
         )
-        # EQUAL_SIGN = BorderType(
-        #     top_right=PLUS.top_right,
-        #     top_left=PLUS.top_left,
-        #     bottom_right=PLUS.bottom_right,
-        #     bottom_left=PLUS.bottom_left,
-        #     top_horizontal="=",
-        #     left_vertical=PLUS.left_vertical,
-        #     bottom_horizontal="=",
-        #     right_vertical=PLUS.right_vertical,
-        # )
         UNDERSCORE = BorderType(
             top_right=" ",
             top_left=" ",
@@ -164,19 +159,8 @@ class BorderTypes:
 # TODO vector2d, ascii art, more borders
 # ― ⍽ ⎸ ⎹ ␣ ─ ━ │ ┃
 # ┄ ┅ ┆ ┇ ┈ ┉ ┊ ┋╌ ╍ ╎ ╏
+# ← ↑ → ↓ ↔ ↕ ↖ ↗ ↘ ↙ ↚ ↛ ↜ ↝ ↞ ↟ ↠ ↡ ↢ ↣ ↤ ↥ ↦ ↧ ↨ ↩ ↪ ↫ ↬ ↭ ↮ ↯ ↰ ↱ ↲ ↳ ↴ ↵ ↶ ↷ ↸ ↹ ↺ ↻ ⇄ ⇅ ⇆ ⇇ ⇈ ⇉ ⇊ ⇍ ⇎ ⇏ ⇐ ⇑ ⇒ ⇓ ⇔ ⇕ ⇖ ⇗ ⇘ ⇙ ⇚ ⇛ ⇜ ⇝ ⇞ ⇟ ⇠ ⇡ ⇢ ⇣ ⇤ ⇥ ⇦ ⇧ ⇨ ⇩ ⇪
+# ☐ ☑ ☒ ⫍ ⫎ ⮹ ⮽ ⺆ ⼌ ⼐ ⼕
 
 
 # DOUBLE and THICK aren't compatible
-# print(
-#     BorderType.thickness(
-#         Thickness.DOUBLE, Thickness.DOUBLE, Thickness.DOUBLE, Thickness.THIN
-#     )
-# )
-
-# print(BorderTypes.CLASSIC)
-
-# print(
-#     BorderType.thickness(
-#         Thickness.THIN, Thickness.THIN, Thickness.DOUBLE, Thickness.THICK
-#     )
-# )

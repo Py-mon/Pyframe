@@ -173,14 +173,36 @@ class Frame(Grid):
 
     def border(self):
         """Add a border around the Matrix."""
-        border = Border(self.border_type, self.height, self.width)
+        border = Border(self.border_type)
+
+        def pattern(
+            junction,
+            width,
+        ):
+            if isinstance(junction, list):
+                return [junction[i % len(junction)] for i in range(width)]
+            return junction * width
+
+        top_row = [
+            border.top_right,
+            *pattern(border.top_horizontal, self.width),
+            border.top_left,
+        ]
+        left_column = border.left_vertical * self.height
+        right_column = border.right_vertical * self.height
+
+        bottom_row = [
+            border.bottom_right,
+            *pattern(border.bottom_horizontal, self.width),
+            border.bottom_left,
+        ]
 
         for i, row in enumerate(self._cells):
-            row.insert(0, border.left_column[i])
-            row.append(border.right_column[i])
+            row.insert(0, left_column[i])
+            row.append(right_column[i])
 
-        self._cells.append(border.bottom_row)  # type: ignore
-        self._cells.insert(0, border.top_row)  # type: ignore
+        self._cells.append(bottom_row)
+        self._cells.insert(0, top_row)
 
         self.height += 2
         self.width += 2
@@ -262,12 +284,22 @@ def get_box(center_of: tuple[int, int], size: tuple[int, int]) -> slice:
     )
 
 
-f = Frame.centered("abcdef\nghij", 4, 10, BorderTypes.CASTLE)
+from pyframe.border.border_type import Thickness
+
+f = Frame.centered(
+    "abcdef\nghij",
+    4,
+    10,
+    BorderType.thickness(
+        Thickness.THIN, Thickness.THIN, Thickness.DOUBLE, Thickness.THICK
+    ),
+)
 print(f.width)
+print(f._cells)
 print(f)
 # f = Frame.box(6, 10)
 # f.add_title(Title("SO", Alignment.CENTER, Colors.BLUE))
-# f.add_frame(Frame.box(2, 2), (1, 0))
-# f.color_border(Colors.RED)
+# f.add_frame(Frame.box(4, 5), (1, 0))
+# # f.color_border(Colors.RED)
 # print(f)
 # print(f.colored_str())

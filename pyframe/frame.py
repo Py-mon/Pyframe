@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from math import ceil
 from typing import Any, Callable, Optional, Self
 
-from pyframe.border.border_type import Border, BorderType, BorderTypes
+from pyframe.border.border_type import Border, BorderType, BorderTypes, Pattern
 from pyframe.border.junction_table import get_junction
 from pyframe.colors import Color, Colors
 from pyframe.grid import Cell, Grid, Junction, add_int_positions, add_positions
@@ -175,18 +175,9 @@ class Frame(Grid):
         """Add a border around the Matrix."""
         border = Border(self.border_type)
 
-        def pattern(
-            junction,
-            width,
-        ):
-            print(type(junction))
-            if isinstance(junction, list):
-                return [junction[i % len(junction)] for i in range(width)]
-            return junction * width
-
         top_row = [
             border.top_right,
-            *pattern(border.top_horizontal, self.width),
+            *(border.top_horizontal * self.width),
             border.top_left,
         ]
 
@@ -195,7 +186,7 @@ class Frame(Grid):
 
         bottom_row = [
             border.bottom_right,
-            *pattern(border.bottom_horizontal, self.width),
+            *(border.bottom_horizontal * self.width),
             border.bottom_left,
         ]
 
@@ -244,8 +235,7 @@ class Frame(Grid):
         self.overlay_from_top_left(frame, pos)
 
         for junction, coord in junctions:
-            print(junction, coord)
-            for direction in junction.dct.copy():
+            for direction in junction._dct.copy():
                 ahead = (0, 0)
                 match direction:
                     case Direction.UP:
@@ -258,11 +248,12 @@ class Frame(Grid):
                         ahead = (coord[0], coord[1] + 1)
                 try:
                     if not isinstance(self[ahead], Junction):
-                        junction.dct.pop(direction)
+                        junction._dct.pop(direction)
                 except IndexError:  # out of bounds
                     pass
-
-            self[coord]._dct = junction.dct
+            x = self[coord]
+            if isinstance(x, Junction):
+                x._dct = junction._dct
 
         if not change_border_color and self.border_color is not None:
             self.color_border(self.border_color)
@@ -288,12 +279,7 @@ def get_box(center_of: tuple[int, int], size: tuple[int, int]) -> slice:
 
 from pyframe.border.border_type import Thickness
 
-f = Frame.centered(
-    "abcdef\nghij",
-    4,
-    10,
-    BorderTypes.CASTLE
-)
+f = Frame.centered("abcdef\nghij", 4, 10, BorderTypes.THIN)
 print(f.width)
 print(f._cells)
 print(f)

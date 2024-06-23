@@ -86,30 +86,25 @@ class Junction(Cell):
     def __init__(
         self,
         dct: JunctionDict,
+        style: str,
         color: Color = Colors.DEFAULT,
     ) -> None:
         self._dct = dct
-
-        self.empty = self.value == " "
-
+        self.style = style
         self.color = color
 
     @property
     def value(self):
-        return get_junction(self._dct)
+        return get_junction(self._dct, self.style)
 
     def __repr__(self):
         return self.value
 
-    @property
-    def dct(self):
-        return self._dct
-
     def __add__(self, junction: Self) -> Self:
-        return type(self)(self.dct | junction.dct, junction.color)
+        return type(self)(self._dct | junction._dct, 'default', junction.color)
 
     def __mul__(self, times: int) -> list[Self]:
-        return [type(self)(self.dct, self.color) for _ in range(times)]
+        return [type(self)(self._dct, self.style, self.color) for _ in range(times)]
 
 
 def add_positions(*tups: tuple[int, int]):

@@ -5,13 +5,10 @@ from pyframe.types_ import Direction, JunctionDict, Thickness
 # table[UP][DOWN][LEFT][RIGHT]
 table = json.load(open(r"pyframe\border\junctions.json", encoding="utf-8"))
 
+
 # TODO separate style and dict
-def get_junction(dct: JunctionDict) -> str:
+def get_junction(dct: JunctionDict, style: str) -> str:
     """Get a str junction from a dict of Directions and Thicknesses."""
-    style = None
-    if isinstance(dct, tuple):
-        style = dct[1]
-        dct = dct[0]
 
     def convert(direction):
         none = "none"
@@ -24,8 +21,8 @@ def get_junction(dct: JunctionDict) -> str:
     junction = table[convert(Direction.UP)][convert(Direction.DOWN)][
         convert(Direction.LEFT)
     ][convert(Direction.RIGHT)]
-    
+
     if isinstance(junction, dict):
-        return junction[style or 'default']
+        return junction[style or "default"]
 
     return junction

@@ -53,4 +53,4 @@ class Thickness(Enum):
     DOUBLE = "double"
 
 
-JunctionDict = dict[Direction, Thickness]
+JunctionDict = dict[Direction, Thickness] | tuple[dict[Direction, Thickness], str]

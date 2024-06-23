@@ -188,6 +188,7 @@ class Frame(Grid):
             *pattern(border.top_horizontal, self.width),
             border.top_left,
         ]
+
         left_column = border.left_vertical * self.height
         right_column = border.right_vertical * self.height
 
@@ -290,9 +291,7 @@ f = Frame.centered(
     "abcdef\nghij",
     4,
     10,
-    BorderType.thickness(
-        Thickness.THIN, Thickness.THIN, Thickness.DOUBLE, Thickness.THICK
-    ),
+    BorderTypes.THIN
 )
 print(f.width)
 print(f._cells)

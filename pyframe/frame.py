@@ -179,6 +179,7 @@ class Frame(Grid):
             junction,
             width,
         ):
+            print(type(junction))
             if isinstance(junction, list):
                 return [junction[i % len(junction)] for i in range(width)]
             return junction * width
@@ -291,7 +292,7 @@ f = Frame.centered(
     "abcdef\nghij",
     4,
     10,
-    BorderTypes.THIN
+    BorderTypes.CASTLE
 )
 print(f.width)
 print(f._cells)

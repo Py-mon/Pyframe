@@ -4,9 +4,9 @@ from typing import Optional, Self
 class Color:
     @classmethod
     def from_hex(cls, name: str, hex_code: str) -> Self:
-        hex_ = hex_code
-        rgb = tuple(int(hex_.lstrip("#")[i : i + 2], 16) for i in (0, 2, 4))
-        return cls(name, hex_, rgb)
+        index = hex_code.lstrip("#")
+        rgb = tuple(int(index[i : i + 2], 16) for i in (0, 2, 4))
+        return cls(name, hex_code, rgb)
 
     @classmethod
     def from_rgb(cls, name: str, r: int, g: int, b: int) -> Self:
@@ -14,7 +14,7 @@ class Color:
         hex_ = "#" + hex(r)[2:] + hex(g)[2:] + hex(b)[2:]
         return cls(name, hex_, rgb)
 
-    def __init__(self, name: str, hex: str, rgb: tuple[int, int, int]):
+    def __init__(self, name: str, hex: str, rgb: tuple[int, ...]):
         self._hex = hex
         self._rgb = rgb
         self.name = name

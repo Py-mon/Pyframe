@@ -161,8 +161,9 @@ class Border:
             
             if isinstance(junction, tuple):
                 return Junction(junction)
-            # if len(junction[0]) > 1:
-            #     return [Cell(x) for x in junction]
+            if len(junction) > 1:
+                print('here')
+                return [Cell(x) for x in junction]
             return Cell(junction)
 
         self.top_right = create_instance(border_type.top_right)

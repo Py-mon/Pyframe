@@ -60,3 +60,9 @@ Subset of [Pybattle](github.com/Py-mon/Pybattle) that uses the Frame classes so 
 ```
 Rendered in VS Code:
 ![image](https://github.com/Py-mon/Pyframe/assets/102424561/adcfe4ac-e035-4347-a5ac-14006fdd4f25)
+
+Includes support for colors!
+
+Coming Soon:
+- Vector2D for operations between positions on placing frames
+- More Ascii tools

@@ -8,8 +8,6 @@ from pyframe.types_ import Direction, JunctionDict, Thickness
 
 StyledJunction = tuple[JunctionDict, str]
 
-# get junction from string
-
 
 class Pattern:
     def __init__(self, *pattern: Junction) -> None:
@@ -19,16 +17,8 @@ class Pattern:
         return [copy(self.pattern[i % len(self.pattern)]) for i in range(times)]
 
     @classmethod
-    def easy(
-        cls,
-        node,
-        thickness,
-    ): ...
-
-    # CASTLE.top_horizontal = Pattern(
-    #     ({Direction.LEFT: Thickness.THIN, Direction.RIGHT: Thickness.THIN}, "default"),
-    #     ({Direction.LEFT: Thickness.THIN, Direction.RIGHT: Thickness.THIN}, "dip_down"),
-    # )
+    def from_string(cls, string: str):
+        return cls(*[Junction.from_string(junction) for junction in string])
 
 
 BorderJunction = Junction | str | Pattern
@@ -236,11 +226,9 @@ def get_dashed_from(parent) -> tuple[BorderType, BorderType, BorderType]:
 
 class _Castle:
     ROUND = copy(BorderTypes.Thin.ROUND)
-    ROUND.top_horizontal = Pattern(
-        Junction.from_string('─'),
-        Junction.from_string('⍽')
-    )
-    
+    ROUND.top_horizontal = Pattern.from_string("─⍽")
+
+
 BorderTypes.Thin.Castle = _Castle
 
 

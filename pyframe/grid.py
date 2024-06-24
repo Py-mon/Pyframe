@@ -101,7 +101,7 @@ class Junction(Cell):
         return self.value
 
     def __add__(self, junction: Self) -> Self:
-        return type(self)(self._dct | junction._dct, 'default', junction.color)
+        return type(self)(self._dct | junction._dct, "default", junction.color)
 
     def __mul__(self, times: int) -> list[Self]:
         return [type(self)(self._dct, self.style, self.color) for _ in range(times)]
@@ -184,8 +184,6 @@ class Grid:
             self.width = level_out(self._cells, alignment)
         else:
             self.width = 0
-            
-        print(self.width)
 
     @property
     def size(self) -> tuple[int, int]:
@@ -264,7 +262,6 @@ class Grid:
             )
 
             for i in range(start_y, stop_y + 1):
-                print(new_cells[i - start_y], self._cells[i][start_x : stop_x + 1])
                 # self._cells[start_y : stop_y + 1][i][start_x : stop_x + 1] = new_cells[
                 #     i - start_y
                 self._cells[i][start_x : stop_x + 1] = new_cells[i - start_y]
@@ -274,7 +271,6 @@ class Grid:
             #     row[start_x : stop_x + 1] = new_cells[i]
 
     def overlay_from_top_left(self, m: Self, pos: tuple[int, int]) -> None:
-        print(add_int_positions(add_positions(pos, m.size), -1))
         self[pos : add_int_positions(add_positions(pos, m.size), -1)] = m
 
     def overlay_from_bottom_right(self, m: Self, pos: tuple[int, int]) -> None:

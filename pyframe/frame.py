@@ -29,7 +29,6 @@ def convert_align_to_pos(
     right_adjustment: int = 0,
     margins: int = 3,
 ):
-    print(alignment)
     if not isinstance(alignment, Alignment):
         return alignment
 
@@ -61,7 +60,7 @@ class Frame(Grid):
         text: str,
         height: int,
         width: int,
-        border_type: BorderType = BorderTypes.THIN,
+        border_type: BorderType = BorderTypes.Thin.ROUND,
         alignment: Alignment = Alignment.CENTER,
     ) -> Self:
         """
@@ -75,7 +74,8 @@ class Frame(Grid):
         ╰──────────╯
         """
         frame = cls(
-            [[Cell(" ") for _ in range(width)] for _ in range(height)], border_type
+            [[Cell(" ") for _ in range(width - 2)] for _ in range(height - 2)],
+            border_type,
         )
 
         aligned_text = Grid(
@@ -92,7 +92,7 @@ class Frame(Grid):
         cls,
         height: int,
         width: int,
-        border_type: BorderType = BorderTypes.THIN,
+        border_type: BorderType = BorderTypes.Thin.ROUND,
     ) -> Self:
         frame = cls(
             [[Cell(" ") for _ in range(width - 2)] for _ in range(height - 2)],
@@ -106,7 +106,7 @@ class Frame(Grid):
     def __init__(
         self,
         cells: list[list[Cell]],
-        border_type: BorderType = BorderTypes.THIN,
+        border_type: BorderType = BorderTypes.Thin.ROUND,
     ) -> None:
         super().__init__(cells)
 
@@ -277,11 +277,40 @@ def get_box(center_of: tuple[int, int], size: tuple[int, int]) -> slice:
     )
 
 
+# Dynamic Boxes
+
+
 from pyframe.border.border_type import Thickness
 
-f = Frame.centered("abcdef\nghij", 4, 10, BorderTypes.THIN)
-print(f.width)
-print(f._cells)
+f1 = Frame.box(4, 9, BorderTypes.Thin.ROUND)
+print(f1)
+
+f2 = Frame.box(4, 9, BorderTypes.Thin.SHARP)
+print(f2)
+
+f3 = Frame.box(
+    4,
+    9,
+    BorderType.thickness(
+        top=Thickness.THIN,
+        bottom=Thickness.THIN,
+        left=Thickness.DOUBLE,
+        right=Thickness.THICK,
+    ),
+)
+print(f3)
+f4 = Frame.box(4, 9, BorderTypes.DOUBLE)
+print(f4)
+
+f5 = Frame.centered("abcdef\nghij", 6, 12, BorderTypes.THICK)
+print(f5)
+
+f = Frame.box(14, 30, BorderTypes.Thin.ROUND)
+f.add_frame(f1, (2, 0))
+f.add_frame(f2, (0, 12))
+f.add_frame(f4, (2, 14))
+f.add_frame(f3, (6, 12))
+f.add_frame(f5, (8, 15))
 print(f)
 # f = Frame.box(6, 10)
 # f.add_title(Title("SO", Alignment.CENTER, Colors.BLUE))
@@ -289,3 +318,4 @@ print(f)
 # # f.color_border(Colors.RED)
 # print(f)
 # print(f.colored_str())
+"&#x21dd"

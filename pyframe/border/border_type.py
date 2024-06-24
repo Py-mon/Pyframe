@@ -16,17 +16,20 @@ class Pattern:
         return [Junction(*self.pattern[i % len(self.pattern)]) for i in range(times)]
 
 
+BorderJunction = StyledJunction | str | Pattern
+
+
 @dataclass
 class BorderType:
-    top_right: StyledJunction | str | Pattern
-    top_left: StyledJunction | str | Pattern
-    bottom_right: StyledJunction | str | Pattern
-    bottom_left: StyledJunction | str | Pattern
+    top_right: BorderJunction
+    top_left: BorderJunction
+    bottom_right: BorderJunction
+    bottom_left: BorderJunction
 
-    top_horizontal: StyledJunction | str | Pattern
-    left_vertical: StyledJunction | str | Pattern
-    bottom_horizontal: StyledJunction | str | Pattern
-    right_vertical: StyledJunction | str | Pattern
+    top_horizontal: BorderJunction
+    left_vertical: BorderJunction
+    bottom_horizontal: BorderJunction
+    right_vertical: BorderJunction
 
     @classmethod
     def thickness(
@@ -76,7 +79,10 @@ class BorderType:
             raise
 
         return cls(
-            top_right=({Direction.DOWN: left, Direction.RIGHT: top}, top_right_style),
+            top_right=(
+                {Direction.DOWN: left, Direction.RIGHT: top},
+                top_right_style,
+            ),  # make junction here? <--
             top_left=({Direction.DOWN: right, Direction.LEFT: top}, top_left_style),
             bottom_right=(
                 {Direction.UP: left, Direction.RIGHT: bottom},
@@ -86,7 +92,10 @@ class BorderType:
                 {Direction.UP: right, Direction.LEFT: bottom},
                 bottom_left_style,
             ),
-            top_horizontal=({Direction.LEFT: top, Direction.RIGHT: top}, top_style),
+            top_horizontal=(
+                {Direction.LEFT: top, Direction.RIGHT: top},
+                top_style,
+            ),  # convert tuple to class
             left_vertical=({Direction.UP: left, Direction.DOWN: left}, left_style),
             bottom_horizontal=(
                 {Direction.LEFT: bottom, Direction.RIGHT: bottom},
@@ -95,11 +104,13 @@ class BorderType:
             right_vertical=({Direction.UP: right, Direction.DOWN: right}, right_style),
         )
 
-    def set_vertical(self, vertical: JunctionDict | str):
-        self.left_vertical = vertical
-        self.right_vertical = vertical
+    def set_vertical_style(self, vertical: str):
+        if isinstance(self.left_vertical, tuple):
+            self.left_vertical = (self.left_vertical[0], vertical)
+        if isinstance(self.right_vertical, tuple):
+            self.right_vertical = (self.right_vertical[0], vertical)
 
-    def set_horizontal(self, horizontal: JunctionDict | str):
+    def set_horizontal(self, horizontal: BorderJunction):
         self.left_horizontal = horizontal
         self.right_horizontal = horizontal
 
@@ -117,7 +128,7 @@ class Border:
             if isinstance(junction, tuple):
                 junction, style = junction
                 return Junction(junction, style)
-            
+
             elif isinstance(junction, Pattern):
                 return junction
 
@@ -151,12 +162,8 @@ class BorderTypes:
         ╚═══╝
     """
 
-    THIN = BorderType.thickness(thickness=Thickness.THIN, corner_style="round")
-    SHARP_THIN = BorderType.thickness(thickness=Thickness.THIN, corner_style="sharp")
-
     THICK = BorderType.thickness(thickness=Thickness.THICK)
     DOUBLE = BorderType.thickness(thickness=Thickness.DOUBLE)
-    
 
     # TRIPLE_DASHED = copy(THIN)
     # TRIPLE_DASHED.set_horizontal("┄")
@@ -182,11 +189,11 @@ class BorderTypes:
     # THICK_DUO_DASHED.set_horizontal("╍")
     # THICK_DUO_DASHED.set_vertical("╏")
 
-    CASTLE = copy(THIN)
-    CASTLE.top_horizontal = Pattern(
-        ({Direction.LEFT: Thickness.THIN, Direction.RIGHT: Thickness.THIN}, "default"),
-        ({Direction.LEFT: Thickness.THIN, Direction.RIGHT: Thickness.THIN}, "dip_down"),
-    )
+    # CASTLE = copy(THIN)
+    # CASTLE.top_horizontal = Pattern(
+    #     ({Direction.LEFT: Thickness.THIN, Direction.RIGHT: Thickness.THIN}, "default"),
+    #     ({Direction.LEFT: Thickness.THIN, Direction.RIGHT: Thickness.THIN}, "dip_down"),
+    # )
     # CASTLE.top_horizontal = Pattern("─", "⍽")
 
     class Classic:
@@ -211,7 +218,44 @@ class BorderTypes:
             right_vertical=PLUS.right_vertical,
         )
 
+    Thin: "type[_Thin]"
+    Thick: "type[_Thick]"
 
+
+class _Thin:
+    ROUND = BorderType.thickness(thickness=Thickness.THIN, corner_style="round")
+    SHARP = BorderType.thickness(thickness=Thickness.THIN, corner_style="sharp")
+
+    Round: "type[_Round]"
+
+
+class _Round:
+    TRIPLE_DASHED = copy(_Thin.ROUND)
+    # TRIPLE_DASHED.set_horizontal("┄")
+    # TRIPLE_DASHED.set_vertical("┆")
+
+    # QUAD_DASHED = copy(THIN)
+    # QUAD_DASHED.set_horizontal("┈")
+    # QUAD_DASHED.set_vertical("┊")
+
+    # DUO_DASHED = copy(THIN)
+    # DUO_DASHED.set_horizontal("╌")
+    # DUO_DASHED.set_vertical("╎")
+
+
+_Thin.Round = _Round
+
+
+class _Thick:
+    THICK = BorderType.thickness(thickness=Thickness.THICK)
+
+
+BorderTypes.Thin = _Thin
+BorderTypes.Thick = _Thick
+
+print(BorderTypes.Thin.ROUND)
+
+print(BorderTypes.Thin.Round.TRIPLE_DASHED)
 # print(BorderTypes.THIN)
 # ↕xx
 # xxx

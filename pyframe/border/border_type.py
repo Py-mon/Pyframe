@@ -1,22 +1,37 @@
-from copy import copy
+from copy import copy, deepcopy
 from dataclasses import dataclass
 from typing import Optional, Self
 
-from pyframe.grid import Cell, Junction
+from pyframe.border.junction import Junction
+from pyframe.grid import Cell
 from pyframe.types_ import Direction, JunctionDict, Thickness
 
 StyledJunction = tuple[JunctionDict, str]
 
+# get junction from string
+
 
 class Pattern:
-    def __init__(self, *pattern: StyledJunction) -> None:
+    def __init__(self, *pattern: Junction) -> None:
         self.pattern = pattern
 
     def __mul__(self, times):
-        return [Junction(*self.pattern[i % len(self.pattern)]) for i in range(times)]
+        return [copy(self.pattern[i % len(self.pattern)]) for i in range(times)]
+
+    @classmethod
+    def easy(
+        cls,
+        node,
+        thickness,
+    ): ...
+
+    # CASTLE.top_horizontal = Pattern(
+    #     ({Direction.LEFT: Thickness.THIN, Direction.RIGHT: Thickness.THIN}, "default"),
+    #     ({Direction.LEFT: Thickness.THIN, Direction.RIGHT: Thickness.THIN}, "dip_down"),
+    # )
 
 
-BorderJunction = StyledJunction | str | Pattern
+BorderJunction = Junction | str | Pattern
 
 
 @dataclass
@@ -79,40 +94,48 @@ class BorderType:
             raise
 
         return cls(
-            top_right=(
+            top_right=Junction(
                 {Direction.DOWN: left, Direction.RIGHT: top},
                 top_right_style,
             ),  # make junction here? <--
-            top_left=({Direction.DOWN: right, Direction.LEFT: top}, top_left_style),
-            bottom_right=(
+            top_left=Junction(
+                {Direction.DOWN: right, Direction.LEFT: top}, top_left_style
+            ),
+            bottom_right=Junction(
                 {Direction.UP: left, Direction.RIGHT: bottom},
                 bottom_right_style,
             ),
-            bottom_left=(
+            bottom_left=Junction(
                 {Direction.UP: right, Direction.LEFT: bottom},
                 bottom_left_style,
             ),
-            top_horizontal=(
+            top_horizontal=Junction(
                 {Direction.LEFT: top, Direction.RIGHT: top},
                 top_style,
             ),  # convert tuple to class
-            left_vertical=({Direction.UP: left, Direction.DOWN: left}, left_style),
-            bottom_horizontal=(
+            left_vertical=Junction(
+                {Direction.UP: left, Direction.DOWN: left}, left_style
+            ),
+            bottom_horizontal=Junction(
                 {Direction.LEFT: bottom, Direction.RIGHT: bottom},
                 bottom_style,
             ),
-            right_vertical=({Direction.UP: right, Direction.DOWN: right}, right_style),
+            right_vertical=Junction(
+                {Direction.UP: right, Direction.DOWN: right}, right_style
+            ),
         )
 
     def set_vertical_style(self, vertical: str):
-        if isinstance(self.left_vertical, tuple):
-            self.left_vertical = (self.left_vertical[0], vertical)
-        if isinstance(self.right_vertical, tuple):
-            self.right_vertical = (self.right_vertical[0], vertical)
+        if isinstance(self.left_vertical, Junction):
+            self.left_vertical.style = vertical
+        if isinstance(self.right_vertical, Junction):
+            self.right_vertical.style = vertical
 
-    def set_horizontal(self, horizontal: BorderJunction):
-        self.left_horizontal = horizontal
-        self.right_horizontal = horizontal
+    def set_horizontal_style(self, horizontal: str):
+        if isinstance(self.top_horizontal, Junction):
+            self.top_horizontal.style = horizontal
+        if isinstance(self.bottom_horizontal, Junction):
+            self.bottom_horizontal.style = horizontal
 
     def __repr__(self) -> str:
         return (
@@ -125,12 +148,10 @@ class BorderType:
 class Border:
     def __init__(self, border_type: BorderType):
         def create_instance(junction):
-            if isinstance(junction, tuple):
-                junction, style = junction
-                return Junction(junction, style)
-
-            elif isinstance(junction, Pattern):
+            if isinstance(junction, (Pattern)):
                 return junction
+            elif isinstance(junction, Junction):
+                return copy(junction)
 
             return Cell(junction)
 
@@ -165,36 +186,12 @@ class BorderTypes:
     THICK = BorderType.thickness(thickness=Thickness.THICK)
     DOUBLE = BorderType.thickness(thickness=Thickness.DOUBLE)
 
-    # TRIPLE_DASHED = copy(THIN)
-    # TRIPLE_DASHED.set_horizontal("┄")
-    # TRIPLE_DASHED.set_vertical("┆")
+    class Thin:
+        ROUND = BorderType.thickness(thickness=Thickness.THIN, corner_style="round")
+        SHARP = BorderType.thickness(thickness=Thickness.THIN, corner_style="sharp")
 
-    # QUAD_DASHED = copy(THIN)
-    # QUAD_DASHED.set_horizontal("┈")
-    # QUAD_DASHED.set_vertical("┊")
-
-    # DUO_DASHED = copy(THIN)
-    # DUO_DASHED.set_horizontal("╌")
-    # DUO_DASHED.set_vertical("╎")
-
-    # THICK_TRIPLE_DASHED = copy(THICK)
-    # THICK_TRIPLE_DASHED.set_horizontal("┅")
-    # THICK_TRIPLE_DASHED.set_vertical("┇")
-
-    # THICK_QUAD_DASHED = copy(THICK)
-    # THICK_QUAD_DASHED.set_horizontal("┉")
-    # THICK_QUAD_DASHED.set_vertical("┋")
-
-    # THICK_DUO_DASHED = copy(THICK)
-    # THICK_DUO_DASHED.set_horizontal("╍")
-    # THICK_DUO_DASHED.set_vertical("╏")
-
-    # CASTLE = copy(THIN)
-    # CASTLE.top_horizontal = Pattern(
-    #     ({Direction.LEFT: Thickness.THIN, Direction.RIGHT: Thickness.THIN}, "default"),
-    #     ({Direction.LEFT: Thickness.THIN, Direction.RIGHT: Thickness.THIN}, "dip_down"),
-    # )
-    # CASTLE.top_horizontal = Pattern("─", "⍽")
+        Dashed: "type[_Dashed]"
+        Castle: "type[_Castle]"
 
     class Classic:
         PLUS = BorderType(
@@ -213,49 +210,59 @@ class BorderTypes:
             bottom_right="|",
             bottom_left="|",
             top_horizontal="_",
-            left_vertical=PLUS.left_vertical,
+            left_vertical="|",
             bottom_horizontal="_",
-            right_vertical=PLUS.right_vertical,
+            right_vertical="|",
         )
 
-    Thin: "type[_Thin]"
-    Thick: "type[_Thick]"
+    ThickDashed: "type[_ThickDashed]"
 
 
-class _Thin:
-    ROUND = BorderType.thickness(thickness=Thickness.THIN, corner_style="round")
-    SHARP = BorderType.thickness(thickness=Thickness.THIN, corner_style="sharp")
+def get_dashed_from(parent) -> tuple[BorderType, BorderType, BorderType]:
+    triple = deepcopy(parent)
+    triple.set_vertical_style("triple_dash")
+    triple.set_horizontal_style("triple_dash")
 
-    Round: "type[_Round]"
+    quad = deepcopy(parent)
+    quad.set_vertical_style("quad_dash")
+    quad.set_horizontal_style("quad_dash")
 
+    duo = deepcopy(parent)
+    duo.set_vertical_style("duo_dash")
+    duo.set_horizontal_style("duo_dash")
 
-class _Round:
-    TRIPLE_DASHED = copy(_Thin.ROUND)
-    # TRIPLE_DASHED.set_horizontal("┄")
-    # TRIPLE_DASHED.set_vertical("┆")
-
-    # QUAD_DASHED = copy(THIN)
-    # QUAD_DASHED.set_horizontal("┈")
-    # QUAD_DASHED.set_vertical("┊")
-
-    # DUO_DASHED = copy(THIN)
-    # DUO_DASHED.set_horizontal("╌")
-    # DUO_DASHED.set_vertical("╎")
+    return triple, quad, duo
 
 
-_Thin.Round = _Round
+class _Castle:
+    ROUND = copy(BorderTypes.Thin.ROUND)
+    ROUND.top_horizontal = Pattern(
+        Junction.from_string('─'),
+        Junction.from_string('⍽')
+    )
+    
+BorderTypes.Thin.Castle = _Castle
 
 
-class _Thick:
-    THICK = BorderType.thickness(thickness=Thickness.THICK)
+class _Dashed:
+    class Round:
+        TRIPLE, QUAD, DUO = get_dashed_from(BorderTypes.Thin.ROUND)
+
+    class Sharp:
+        TRIPLE, QUAD, DUO = get_dashed_from(BorderTypes.Thin.SHARP)
 
 
-BorderTypes.Thin = _Thin
-BorderTypes.Thick = _Thick
+BorderTypes.Thin.Dashed = _Dashed
 
-print(BorderTypes.Thin.ROUND)
 
-print(BorderTypes.Thin.Round.TRIPLE_DASHED)
+class _ThickDashed:
+    TRIPLE, QUAD, DUO = get_dashed_from(BorderTypes.THICK)
+
+
+BorderTypes.Thin = BorderTypes.Thin
+BorderTypes.ThickDashed = _ThickDashed
+
+
 # print(BorderTypes.THIN)
 # ↕xx
 # xxx

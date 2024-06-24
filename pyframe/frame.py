@@ -4,9 +4,9 @@ from math import ceil
 from typing import Any, Callable, Optional, Self
 
 from pyframe.border.border_type import Border, BorderType, BorderTypes, Pattern
-from pyframe.border.junction_table import get_junction
+from pyframe.border.junction import Junction
 from pyframe.colors import Color, Colors
-from pyframe.grid import Cell, Grid, Junction, add_int_positions, add_positions
+from pyframe.grid import Cell, Grid, add_int_positions, add_positions
 from pyframe.types_ import Alignment, Direction, JunctionDict, Level
 
 
@@ -235,7 +235,7 @@ class Frame(Grid):
         self.overlay_from_top_left(frame, pos)
 
         for junction, coord in junctions:
-            for direction in junction._dct.copy():
+            for direction in junction._directions.copy():
                 ahead = (0, 0)
                 match direction:
                     case Direction.UP:
@@ -248,12 +248,12 @@ class Frame(Grid):
                         ahead = (coord[0], coord[1] + 1)
                 try:
                     if not isinstance(self[ahead], Junction):
-                        junction._dct.pop(direction)
+                        junction._directions.pop(direction)
                 except IndexError:  # out of bounds
                     pass
             x = self[coord]
             if isinstance(x, Junction):
-                x._dct = junction._dct
+                x._directions = junction._directions
 
         if not change_border_color and self.border_color is not None:
             self.color_border(self.border_color)
@@ -318,4 +318,3 @@ print(f)
 # # f.color_border(Colors.RED)
 # print(f)
 # print(f.colored_str())
-"&#x21dd"

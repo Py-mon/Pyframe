@@ -14,7 +14,6 @@ from typing import (
     overload,
 )
 
-from pyframe.border.junction_table import get_junction
 from pyframe.colors import Color, Colors
 from pyframe.types_ import Alignment, Direction, JunctionDict
 
@@ -80,31 +79,6 @@ class Cell:
     #     return Cell(self.value, self.color)
 
 
-class Junction(Cell):
-    """A Cell that is the borders of frames."""
-
-    def __init__(
-        self,
-        dct: JunctionDict,
-        style: str,
-        color: Color = Colors.DEFAULT,
-    ) -> None:
-        self._dct = dct
-        self.style = style
-        self.color = color
-
-    @property
-    def value(self):
-        return get_junction(self._dct, self.style)
-
-    def __repr__(self):
-        return self.value
-
-    def __add__(self, junction: Self) -> Self:
-        return type(self)(self._dct | junction._dct, "default", junction.color)
-
-    def __mul__(self, times: int) -> list[Self]:
-        return [type(self)(self._dct, self.style, self.color) for _ in range(times)]
 
 
 def add_positions(*tups: tuple[int, int]):

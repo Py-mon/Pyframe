@@ -1,21 +1,7 @@
-from collections.abc import Iterable
-from copy import copy, deepcopy
-from functools import cache
-from typing import (
-    Any,
-    Callable,
-    Generator,
-    Iterable,
-    Literal,
-    Optional,
-    Self,
-    Type,
-    Union,
-    overload,
-)
+from typing import Generator, Self, overload
 
 from pyframe.colors import Color, Colors
-from pyframe.types_ import Alignment, Direction, JunctionDict
+from pyframe.types_ import Alignment
 
 
 class Cell:
@@ -26,13 +12,10 @@ class Cell:
         value: str,
         color: Color = Colors.DEFAULT,
     ) -> None:
-        # if len(value) > 1:
-        #     raise ValueError("value more than 1 character")
+        if len(value) > 1:
+            raise ValueError("value more than 1 character. use `BorderPattern`")
 
         self.value = value
-
-        self.empty = self.value == " "
-
         self.color = color
 
     def update(self, cell: Self):
@@ -77,8 +60,6 @@ class Cell:
 
     # def __copy__(self):
     #     return Cell(self.value, self.color)
-
-
 
 
 def add_positions(*tups: tuple[int, int]):

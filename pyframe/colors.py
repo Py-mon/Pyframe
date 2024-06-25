@@ -1,4 +1,4 @@
-from typing import Optional, Self
+from typing import Self
 
 
 class Color:

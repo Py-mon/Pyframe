@@ -83,7 +83,7 @@
       },
       "none": {
         "thick": "┕",
-        "thin": {"round": "╰", "sharp": "└" },
+        "thin": { "round": "╰", "sharp": "└" },
         "none": "╵",
         "double": "╘"
       },
@@ -101,7 +101,7 @@
         "none": "┓"
       },
       "thin": {
-        "thick": "┮",
+        "thick": "┲",
         "thin": "┰",
         "none": "┒"
       },

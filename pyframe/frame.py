@@ -82,7 +82,7 @@ class Frame(Grid):
         aligned_text = Grid(
             [[Cell(cell) for cell in row] for row in text.split("\n")], alignment
         )
-        slice_ = get_box(frame.size, add_int_positions(aligned_text.size, -1))
+        slice_ = get_centered_box(frame.size, add_int_positions(aligned_text.size, -1))
 
         frame[slice_] = aligned_text
 
@@ -122,6 +122,9 @@ class Frame(Grid):
         if self.width != 0:
             self.border()
 
+        self.children = []
+        self.parents = []
+
     def color_inner(self, color: Color):
         self.base_color = color
         self.color(
@@ -152,7 +155,7 @@ class Frame(Grid):
         """Remove the border."""
         self._cells = self[(1, 1) : add_int_positions(self.size, -2)]._cells
 
-    def add_title(self, title: Title) -> None:
+    def add_title(self, title: Title) -> None:  # make titles better
         matrix = Grid(
             [
                 [Cell(cell) for cell in row]
@@ -201,12 +204,25 @@ class Frame(Grid):
         self.height += 2
         self.width += 2
 
-        self.border_coords = (
-            [(0, i) for i in range(self.width)]
-            + [(self.height - 1, i) for i in range(self.width)]
-            + [(i, 0) for i in range(1, self.height - 1)]
-            + [(i, self.width - 1) for i in range(self.height - 1)]
-        )
+        self.top_coords = [(0, i) for i in range(1, self.width - 1)]
+        self.bottom_coords = [(self.height - 1, i) for i in range(1, self.width - 1)]
+        self.left_coords = [(i, 0) for i in range(1, self.height - 1)]
+        self.right_coords = [(i, self.width - 1) for i in range(1, self.height - 1)]
+
+        self.corner_coords = [
+            (0, 0),
+            (0, self.width - 1),
+            (self.height - 1, 0),
+            (self.height - 1, self.width - 1),
+        ]
+
+        self.border_coords = [
+            *self.top_coords,
+            *self.bottom_coords,
+            *self.left_coords,
+            *self.right_coords,
+            *self.corner_coords,
+        ]
 
         for title in self.titles.copy():
             self.add_title(title)
@@ -217,44 +233,40 @@ class Frame(Grid):
         pos: tuple[int, int] = (0, 0),
         change_border_color: bool = False,
     ) -> None:
-        # deepcopy frame if not wanted to share changes
-        # frame.objs.append(self)
+        frame.parents.append(self)
+        self.children.append(frame)
 
         junctions: list[tuple[Junction, tuple[int, int]]] = []
 
-        for coord in frame.border_coords:
-            coord_pos = add_positions(coord, pos)
+        def combine_junctions(coords, remove_direction=None):
+            for coord in coords:
+                coord_pos = add_positions(coord, pos)
 
-            self_junction = self[coord_pos]
-            frame_junction = frame[coord]
+                self_junction = self[coord_pos]
+                frame_junction = frame[coord]
 
-            if isinstance(self_junction, Junction) and isinstance(
-                frame_junction, Junction
-            ):
-                junctions.append((self_junction + frame_junction, coord_pos))
+                if not isinstance(self_junction, Junction) or not isinstance(
+                    frame_junction, Junction
+                ):
+                    continue
+
+                junction = self_junction + frame_junction
+                if remove_direction and remove_direction in junction._directions:
+                    junction._directions.pop(remove_direction)
+                junction._update_value()
+                junctions.append((junction, coord_pos))
+
+        combine_junctions(frame.top_coords, Direction.DOWN)
+        combine_junctions(frame.bottom_coords, Direction.UP)
+        combine_junctions(frame.left_coords, Direction.RIGHT)
+        combine_junctions(frame.right_coords, Direction.LEFT)
+        combine_junctions(frame.right_coords, Direction.LEFT)
+        combine_junctions(frame.corner_coords)
 
         self.overlay_from_top_left(frame, pos)
 
         for junction, coord in junctions:
-            for direction in junction._directions.copy():
-                ahead = (0, 0)
-                match direction:
-                    case Direction.UP:
-                        ahead = (coord[0] - 1, coord[1])
-                    case Direction.DOWN:
-                        ahead = (coord[0] + 1, coord[1])
-                    case Direction.LEFT:
-                        ahead = (coord[0], coord[1] - 1)
-                    case Direction.RIGHT:
-                        ahead = (coord[0], coord[1] + 1)
-                try:
-                    if not isinstance(self[ahead], Junction):
-                        junction._directions.pop(direction)
-                except IndexError:  # out of bounds
-                    pass
-            x = self[coord]
-            if isinstance(x, Junction):
-                x._directions = junction._directions
+            self[coord] = junction
 
         if not change_border_color and self.border_color is not None:
             self.color_border(self.border_color)
@@ -264,8 +276,8 @@ class Frame(Grid):
     #         self[Coord(0, i + 2)] = Cell(char, self.title_color, True)
 
 
-def get_box(center_of: tuple[int, int], size: tuple[int, int]) -> slice:
-    """Get a slice that is the size of inner_size in the center of the outer_size."""
+def get_centered_box(center_of: tuple[int, int], size: tuple[int, int]) -> slice:
+    """Get a slice that is the shape of `size` in the center of the `center_of`."""
     return slice(
         (
             ceil((center_of[0] - size[0]) / 2 - 1),
@@ -306,12 +318,12 @@ print(f4)
 f5 = Frame.centered("abcdef\nghij", 6, 12, BorderTypes.THICK)
 print(f5)
 
-f = Frame.box(14, 30, BorderTypes.Thin.ROUND)
+f = Frame.box(15, 30, BorderTypes.Thin.ROUND)
 f.add_frame(f1, (2, 0))
 f.add_frame(f2, (0, 12))
 f.add_frame(f4, (2, 14))
 f.add_frame(f3, (6, 12))
-f.add_frame(f5, (8, 15))
+f.add_frame(f5, (9, 15))
 print(f)
 # f = Frame.box(6, 10)
 # f.add_title(Title("SO", Alignment.CENTER, Colors.BLUE))

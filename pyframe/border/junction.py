@@ -5,13 +5,13 @@ from pyframe.colors import Color, Colors
 from pyframe.grid import Cell
 from pyframe.types_ import Direction, JunctionDict, Thickness
 
-# table[UP][DOWN][LEFT][RIGHT]
-table = json.load(open(r"pyframe\border\junctions.json", encoding="utf-8"))
-direction_order = [Direction.UP, Direction.DOWN, Direction.LEFT, Direction.RIGHT]
+# TABLE[UP][DOWN][LEFT][RIGHT] -> Junction string
+TABLE = json.load(open(r"pyframe\border\junctions.json", encoding="utf-8"))
+DIRECTION_ORDER = [Direction.UP, Direction.DOWN, Direction.LEFT, Direction.RIGHT]
 
 
 class Junction(Cell):
-    """A Cell that is the borders of frames."""
+    """A `Cell` that is a part of a border of a `Frame`."""
 
     def __init__(
         self,
@@ -23,31 +23,38 @@ class Junction(Cell):
         self.style = style
         self.color = color
 
-    @property
-    def value(self):
-        def convert(direction):
-            none = "none"
+        self._update_value()
+
+    def _update_value(self):
+        def get_directional_thickness(direction):
             result = self._directions.get(direction)
             if result:
                 return result.value
             else:
-                return none
+                return "none"
 
-        junction = table[convert(direction_order[0])][convert(direction_order[1])][
-            convert(direction_order[2])
-        ][convert(direction_order[3])]
+        junction: str | dict[str, str] = TABLE[
+            get_directional_thickness(DIRECTION_ORDER[0])
+        ][get_directional_thickness(DIRECTION_ORDER[1])][
+            get_directional_thickness(DIRECTION_ORDER[2])
+        ][
+            get_directional_thickness(DIRECTION_ORDER[3])
+        ]
 
+        # Style
         if isinstance(junction, dict):
-            return junction[self.style or "default"]
+            junction = junction[self.style or "default"]
 
-        return junction
+        self.value = junction
 
     def __repr__(self):
         return self.value
 
     def __add__(self, junction: Self) -> Self:
         return type(self)(
-            self._directions | junction._directions, "default", junction.color
+            self._directions | junction._directions,
+            "default",
+            junction.color,  # 'default'?
         )
 
     def __mul__(self, times: int) -> list[Self]:
@@ -60,23 +67,21 @@ class Junction(Cell):
 
     @classmethod
     def from_string(cls, string: str):
-        def get_path(nested_dict, value, pre=()):
+        def get_path(nested_dict, value, pre=()) -> tuple[str, str, str, str, str]:
             for k, v in nested_dict.items():
                 path = pre + (k,)
-                if v == value:  # found value
+                if v == value:
                     return path
-                elif hasattr(v, "items"):  # v is a dict
-                    p = get_path(v, value, path)  # recursive call
+                elif hasattr(v, "items"):
+                    p = get_path(v, value, path)
                     if p is not None:
                         return p
 
-        path = get_path(table, string)
+        *path, style = get_path(TABLE, string)
 
         dct = {}
         for i, thickness in enumerate(path):
-            if i == 4:
-                style = thickness
-                return Junction(dct, style)
             if thickness != "none":
-                dct[direction_order[i]] = Thickness.__getitem__(thickness.upper())
-        return Junction(dct, "default")
+                dct[DIRECTION_ORDER[i]] = Thickness.__getitem__(thickness.upper())
+
+        return Junction(dct, style)

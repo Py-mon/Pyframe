@@ -254,7 +254,6 @@ class Grid:
         self[add_y_from(pos, -(m.height - 1)) : add_x_from(pos, m.width + 1)] = m
 
     def overlay_from_top_right(self, m: Self, pos: tuple[int, int]) -> None:
-        print(add_x_from(pos, -(m.width - 1)), pos, -(m.width - 1))
         self[add_x_from(pos, -(m.width - 1)) : add_y_from(pos, m.height + 1)] = m
 
     # def overlay_from_top_left(self, m: "Grid", pos: Coord) -> None:
@@ -289,7 +288,6 @@ class Grid:
         pre_cell = None
         for row in self.rows:
             for cell in row + [Cell("\n")]:
-                # print(cell.color, pre_cell.color if pre_cell else "")
                 color = ""
                 if pre_cell is None:
                     color = f'\033[38;2;{";".join([str(x) for x in cell.color.rgb])}m'

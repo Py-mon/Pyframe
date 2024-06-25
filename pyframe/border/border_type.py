@@ -87,7 +87,7 @@ class BorderType:
             top_right=Junction(
                 {Direction.DOWN: left, Direction.RIGHT: top},
                 top_right_style,
-            ),  # make junction here? <--
+            ),
             top_left=Junction(
                 {Direction.DOWN: right, Direction.LEFT: top}, top_left_style
             ),
@@ -102,7 +102,7 @@ class BorderType:
             top_horizontal=Junction(
                 {Direction.LEFT: top, Direction.RIGHT: top},
                 top_style,
-            ),  # convert tuple to class
+            ),
             left_vertical=Junction(
                 {Direction.UP: left, Direction.DOWN: left}, left_style
             ),
@@ -138,7 +138,7 @@ class BorderType:
 class Border:
     def __init__(self, border_type: BorderType):
         def create_instance(junction):
-            if isinstance(junction, (Pattern)):
+            if isinstance(junction, Pattern):
                 return junction
             elif isinstance(junction, Junction):
                 return copy(junction)
@@ -155,11 +155,6 @@ class Border:
         self.bottom_horizontal = create_instance(border_type.bottom_horizontal)
         self.right_vertical = create_instance(border_type.right_vertical)
 
-
-
-# print(BorderTypes.THIN)
-# ↕xx
-# xxx
 
 # TODO vector2d, ascii art, more borders
 # ― ⍽ ⎸ ⎹ ␣ ─ ━ │ ┃

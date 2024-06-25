@@ -1,4 +1,4 @@
-import json
+from json import load
 from typing import Self
 
 from pyframe.colors import Color, Colors
@@ -6,7 +6,7 @@ from pyframe.grid import Cell
 from pyframe.types_ import Direction, JunctionDict, Thickness
 
 # TABLE[UP][DOWN][LEFT][RIGHT] -> Junction string
-TABLE = json.load(open(r"pyframe\border\junctions.json", encoding="utf-8"))
+TABLE = load(open(r"pyframe\border\junctions.json", encoding="utf-8"))
 DIRECTION_ORDER = [Direction.UP, Direction.DOWN, Direction.LEFT, Direction.RIGHT]
 
 
@@ -26,6 +26,8 @@ class Junction(Cell):
         self._update_value()
 
     def _update_value(self):
+        """Update the junction `value` with changed `_directions`."""
+
         def get_directional_thickness(direction):
             result = self._directions.get(direction)
             if result:
@@ -53,8 +55,8 @@ class Junction(Cell):
     def __add__(self, junction: Self) -> Self:
         return type(self)(
             self._directions | junction._directions,
-            "default",
-            junction.color,  # 'default'?
+            "default",  # 'default' because you cant have dashed ┯
+            junction.color,
         )
 
     def __mul__(self, times: int) -> list[Self]:
@@ -80,7 +82,7 @@ class Junction(Cell):
         result = get_path(TABLE, string)
         if not result:
             return super()(string)
-        
+
         *path, style = result
 
         dct = {}

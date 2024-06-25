@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from math import ceil
 from typing import Any, Callable, Optional, Self
 
-from pyframe.border.border_type import Border, BorderType, Pattern
+from pyframe.border.border_type import Border, BorderPattern, BorderType
 from pyframe.border.border_types import BorderTypes
 from pyframe.border.junction import Junction
 from pyframe.colors import Color, Colors

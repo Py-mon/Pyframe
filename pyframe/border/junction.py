@@ -77,7 +77,11 @@ class Junction(Cell):
                     if p is not None:
                         return p
 
-        *path, style = get_path(TABLE, string)
+        result = get_path(TABLE, string)
+        if not result:
+            return super()(string)
+        
+        *path, style = result
 
         dct = {}
         for i, thickness in enumerate(path):

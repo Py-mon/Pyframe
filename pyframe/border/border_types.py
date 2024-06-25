@@ -2,10 +2,10 @@ from copy import copy, deepcopy
 from dataclasses import dataclass
 from typing import Optional, Self
 
+from pyframe.border.border_type import BorderPattern, BorderType
 from pyframe.border.junction import Junction
 from pyframe.grid import Cell
 from pyframe.types_ import Direction, JunctionDict, Thickness
-from pyframe.border.border_type import BorderType, Pattern
 
 
 class BorderTypes:
@@ -78,7 +78,7 @@ def get_dashed_from(parent) -> tuple[BorderType, BorderType, BorderType]:
 
 class _Castle:
     ROUND = copy(BorderTypes.Thin.ROUND)
-    ROUND.top_horizontal = Pattern.from_string("─⍽")
+    ROUND.top_horizontal = BorderPattern.from_string("─⍽")
 
 
 BorderTypes.Thin.Castle = _Castle

@@ -1,16 +1,24 @@
-from copy import copy, deepcopy
+from copy import copy
 from dataclasses import dataclass
-from typing import Optional, Self
+from typing import Optional
 
 from pyframe.border.junction import Junction
 from pyframe.grid import Cell
-from pyframe.types_ import Direction, JunctionDict, Thickness
-
-StyledJunction = tuple[JunctionDict, str]
+from pyframe.types_ import Direction, Thickness
 
 
-class Pattern:
-    def __init__(self, *pattern: Junction) -> None:
+class BorderPattern:
+    """A pattern of Junctions for a side of a border.
+
+    ```
+    >>> BorderPattern.from_string('-+') * 5
+    "-+-+-'
+    ```
+
+    `from_string` is the easiest constructor.
+    """
+
+    def __init__(self, *pattern: Junction | Cell) -> None:
         self.pattern = pattern
 
     def __mul__(self, times):
@@ -21,20 +29,27 @@ class Pattern:
         return cls(*[Junction.from_string(junction) for junction in string])
 
 
-BorderJunction = Junction | str | Pattern
+BorderJunctions = Junction | str | BorderPattern
 
 
 @dataclass
 class BorderType:
-    top_right: BorderJunction
-    top_left: BorderJunction
-    bottom_right: BorderJunction
-    bottom_left: BorderJunction
+    """Stores the styles and thicknesses of borders used in `Frames`.
 
-    top_horizontal: BorderJunction
-    left_vertical: BorderJunction
-    bottom_horizontal: BorderJunction
-    right_vertical: BorderJunction
+    If an attribute is a string, it no longer becomes a Junction type and overrides other borders.
+
+    Note: `DOUBLE` and `THICK` aren't compatible thicknesses due to unicode limitations.
+    """
+
+    top_right: BorderJunctions
+    top_left: BorderJunctions
+    bottom_right: BorderJunctions
+    bottom_left: BorderJunctions
+
+    top_horizontal: BorderJunctions
+    left_vertical: BorderJunctions
+    bottom_horizontal: BorderJunctions
+    right_vertical: BorderJunctions
 
     @classmethod
     def thickness(
@@ -43,6 +58,7 @@ class BorderType:
         bottom: Optional[Thickness] = None,
         left: Optional[Thickness] = None,
         right: Optional[Thickness] = None,
+        *,
         top_style: str = "default",
         left_style: str = "default",
         bottom_style: str = "default",
@@ -51,11 +67,37 @@ class BorderType:
         top_left_style: str = "default",
         bottom_right_style: str = "default",
         bottom_left_style: str = "default",
-        *,
         thickness: Optional[Thickness] = None,
         style: Optional[str] = None,
         corner_style: Optional[str] = None,
     ):
+        """
+        #### Thickness (cannot be None if `thickness` argument is None)
+        - `top` -> the thickness of the top of the border
+        - `bottom` -> the thickness of the bottom of the border
+        - `left` -> the thickness of the left side of the border
+        - `right` -> the thickness of the right side of the border
+        
+        - `thickness` overrides all of the arguments above that are `None`.
+
+        #### Style
+        - `top_style` -> the style of the top of the border
+        - `bottom_style` -> the style of the bottom of the border
+        - `left_style` -> the style of the left side of the border
+        - `right_style` -> the style of the right side of the border
+        
+        - `style` overrides all of the arguments above that are `None`.
+
+        #### Corner Style
+        - `top_right_style` -> the style of the top right corner
+        - `top_left_style` -> the style of the top left corner
+        - `bottom_right_style` -> the style of the bottom right corner
+        - `bottom_left_style` -> the style of the bottom left corner
+        
+        - `corner_style` overrides all of the arguments above that are `None`.
+        
+        (corners thickness automatically assigned)
+        """
         if style:
             if top_style == "default":
                 top_style = style
@@ -137,13 +179,13 @@ class BorderType:
 
 class Border:
     def __init__(self, border_type: BorderType):
-        def create_instance(junction):
-            if isinstance(junction, Pattern):
-                return junction
-            elif isinstance(junction, Junction):
-                return copy(junction)
+        def create_instance(border_junctions: BorderJunctions):
+            if isinstance(border_junctions, BorderPattern):
+                return border_junctions
+            elif isinstance(border_junctions, Junction):
+                return copy(border_junctions)
 
-            return Cell(junction)
+            return Cell(border_junctions)
 
         self.top_right = create_instance(border_type.top_right)
         self.top_left = create_instance(border_type.top_left)
@@ -154,15 +196,3 @@ class Border:
         self.left_vertical = create_instance(border_type.left_vertical)
         self.bottom_horizontal = create_instance(border_type.bottom_horizontal)
         self.right_vertical = create_instance(border_type.right_vertical)
-
-
-# TODO vector2d, ascii art, more borders
-# ― ⍽ ⎸ ⎹ ␣ ─ ━ │ ┃
-# ┄ ┅ ┆ ┇ ┈ ┉ ┊ ┋╌ ╍ ╎ ╏
-# ← ↑ → ↓ ↔ ↕ ↖ ↗ ↘ ↙ ↚ ↛ ↜ ↝ ↞ ↟ ↠ ↡ ↢ ↣ ↤ ↥ ↦ ↧ ↨ ↩ ↪ ↫ ↬ ↭ ↮ ↯ ↰ ↱ ↲ ↳ ↴ ↵ ↶ ↷ ↸ ↹ ↺ ↻ ⇄ ⇅ ⇆ ⇇ ⇈ ⇉ ⇊ ⇍ ⇎ ⇏ ⇐ ⇑ ⇒ ⇓ ⇔ ⇕ ⇖ ⇗ ⇘ ⇙ ⇚ ⇛ ⇜ ⇝ ⇞ ⇟ ⇠ ⇡ ⇢ ⇣ ⇤ ⇥ ⇦ ⇧ ⇨ ⇩ ⇪
-# ☐ ☑ ☒ ⫍ ⫎ ⮹ ⮽ ⺆ ⼌ ⼐ ⼕
-# ↼ ↽ ↾ ↿ ⇀ ⇁ ⇂ ⇃ ⇋ ⇌
-# ╱ ╲ ╳
-
-# DOUBLE and THICK aren't compatible
-# THIN only has rounded corners

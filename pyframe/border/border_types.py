@@ -1,28 +1,20 @@
 from copy import copy, deepcopy
-from dataclasses import dataclass
-from typing import Optional, Self
-
 from pyframe.border.border_type import BorderPattern, BorderType
-from pyframe.border.junction import Junction
-from pyframe.grid import Cell
-from pyframe.types_ import Direction, JunctionDict, Thickness
+from pyframe.types_ import Thickness
 
 
 class BorderTypes:
     """
+    See docs [link here] for all examples.
+
+    Or print individually for examples.
+
     ```
-    Thin:
-        ╭───╮
-        │   │
-        ╰───╯
-    Thick:
-        ┏━━━┓
-        ┃   ┃
-        ┗━━━┛
-    Double:
-        ╔═══╗
-        ║   ║
-        ╚═══╝
+    print(BorderTypes.DOUBLE)
+    ╔═══╗
+    ║   ║
+    ╚═══╝
+    ```
     """
 
     THICK = BorderType.thickness(thickness=Thickness.THICK)
@@ -33,7 +25,6 @@ class BorderTypes:
         SHARP = BorderType.thickness(thickness=Thickness.THIN, corner_style="sharp")
 
         Dashed: "type[_Dashed]"
-        Castle: "type[_Castle]"
 
     class OverlapClassic:
         DASHED = BorderType(
@@ -86,6 +77,7 @@ class BorderTypes:
         )
 
     ThickDashed: "type[_ThickDashed]"
+    Castle: "type[_Castle]"
 
 
 def get_dashed_from(parent) -> tuple[BorderType, BorderType, BorderType]:
@@ -109,7 +101,7 @@ class _Castle:
     ROUND.top_horizontal = BorderPattern.from_string("─⍽")
 
 
-BorderTypes.Thin.Castle = _Castle
+BorderTypes.Castle = _Castle
 
 
 class _Dashed:

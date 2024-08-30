@@ -36,7 +36,7 @@ class BorderType:
 
     If an attribute is a string, it no longer becomes a Junction type and overrides other borders.
 
-    Note: `DOUBLE` and `THICK` aren't compatible thicknesses due to unicode limitations.
+    Note: `DOUBLE` and `THICK` aren't compatible thicknesses due to box-drawing character limitations.
     """
 
     top_right: BorderJunctions
@@ -178,9 +178,9 @@ class BorderType:
 
     def __repr__(self) -> str:
         return (
-            f"{self.top_right}{str(self.top_horizontal)}{self.top_left}\n"
-            f"{self.left_vertical}    {self.right_vertical}\n"
-            f"{self.bottom_right}{str(self.bottom_horizontal)}{self.bottom_left}\n"
+            f"{self.top_right}{str(self.top_horizontal) * 3}{self.top_left}\n"
+            f"{self.left_vertical}   {self.right_vertical}\n"
+            f"{self.bottom_right}{str(self.bottom_horizontal) * 3}{self.bottom_left}\n"
         )
 
 

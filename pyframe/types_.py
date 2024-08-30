@@ -30,9 +30,11 @@ class Alignment(Enum):
         return ""
 
 
-class Level(Enum):
+class TitleSide(Enum):
     TOP = 0
     BOTTOM = -1
+    LEFT = 1
+    RIGHT = 2
 
 
 class Side(Enum):

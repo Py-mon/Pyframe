@@ -8,16 +8,16 @@ from pyframe.border.border_types import BorderTypes
 from pyframe.border.junction import Junction
 from pyframe.colors import Color, Colors
 from pyframe.grid import Cell, Grid, add_int_positions, add_positions
-from pyframe.types_ import Alignment, Direction, JunctionDict, Level
+from pyframe.types_ import Alignment, Direction, JunctionDict, TitleSide
 
 
 @dataclass
 class Title:
     title: str
-    x: int | Alignment = Alignment.LEFT
+    alignment: int | Alignment = Alignment.LEFT
     color: Color = Colors.DEFAULT
     margin: int = 2
-    level: Level = Level.TOP
+    title_side: TitleSide = TitleSide.TOP  # side titles
 
 
 def get_center_position(position):
@@ -26,23 +26,26 @@ def get_center_position(position):
 
 def convert_align_to_pos(
     alignment: Alignment | int,
-    of: tuple[int, int],
-    right_adjustment: int = 0,
-    margins: int = 3,
+    of: int,
+    length_adjustment: int = 0,
+    margin: int = 3,
 ):
     if not isinstance(alignment, Alignment):
         return alignment
 
+    max_margin = of - length_adjustment - 4  # two corners, two title sides
+    margin = min(max_margin, margin)
+
     if alignment == type(alignment).CENTER or alignment == type(alignment).MIDDLE:
-        return get_center_position(of)[1] - 1
+        return of // 2 - ceil(length_adjustment / 2) + 1
     elif alignment == type(alignment).LEFT:
-        right_offset_margin = of[1] - margins - right_adjustment
-        if margins >= right_offset_margin:
+        right_offset_margin = of - margin - length_adjustment
+        if margin >= right_offset_margin:
             return right_offset_margin
 
-        return margins
+        return margin
     elif alignment == type(alignment).RIGHT:
-        return of[1] - right_adjustment - margins
+        return of - length_adjustment - margin
 
 
 def rect_range(stop, start=None) -> list[tuple[int, int]]:
@@ -135,44 +138,50 @@ class Frame(Grid):
         self.border_color = color
         self.color(self.border_color, self.border_coords)
 
-        self.recolor_titles()
+        self._add_titles()
 
-    def recolor_titles(self):
+    def _add_titles(self):
+        title_right = self.border_type.title_right or "╶"
+        title_left = self.border_type.title_left or "╴"
+
         for title in self.titles:
-            pos = convert_align_to_pos(
-                title.x, self.size, len(title.title), title.margin + 1
+            
+            matrix = Grid(
+                [
+                    [Cell(title_left, color=self.border_color)]
+                    + [Cell(cell, color=title.color) for cell in title.title]
+                    + [Cell(title_right, color=self.border_color)]
+                ]
             )
 
-            self.color(
-                title.color,
-                rect_range(
-                    (title.level.value, pos + len(title.title) - 1),
-                    (title.level.value, pos),
+            pos = convert_align_to_pos(
+                title.alignment,
+                (
+                    self.size[0]
+                    if title.title_side in [TitleSide.LEFT, TitleSide.RIGHT]
+                    else self.size[1]
                 ),
+                len(title.title),
+                title.margin + 1,
             )
+
+            start_pos = pos - 1
+            end_pos = pos + len(title.title)
+
+            if title.title_side == TitleSide.LEFT:
+                self[(start_pos, 0):(end_pos, 0)] = Grid(list(map(list, zip(*matrix._cells))))
+            elif title.title_side == TitleSide.RIGHT:
+                self[(start_pos, -1):(start_pos, -1)] = Grid(list(map(list, zip(*matrix._cells))))
+            elif title.title_side == TitleSide.TOP:
+                self[(0, start_pos):(0, start_pos)] = matrix
+            elif title.title_side == TitleSide.BOTTOM:
+                self[(-1, start_pos):(-1, start_pos)] = matrix
 
     def unborder(self):
         """Remove the border."""
         self._cells = self[(1, 1) : add_int_positions(self.size, -2)]._cells
 
     def add_title(self, title: Title) -> None:  # make titles better
-        matrix = Grid(
-            [
-                [Cell(cell) for cell in row]
-                for row in ("╴" + title.title + "╶").split("\n")
-            ]
-        )
-
-        # matrix.color(title.color, matrix.size.i.sub_x(1).rect_range(Coord(0, 1)))
-
-        pos = convert_align_to_pos(
-            title.x, self.size, len(title.title), title.margin + 1
-        )
-
-        self[
-            (title.level.value, pos - 1) : (title.level.value, pos + len(title.title))
-        ] = matrix  # type: ignore
-
         self.titles.append(title)
 
     def border(self):
@@ -224,8 +233,7 @@ class Frame(Grid):
             *self.corner_coords,
         ]
 
-        for title in self.titles.copy():
-            self.add_title(title)
+        self._add_titles()
 
     def add_frame(
         self,
@@ -271,9 +279,7 @@ class Frame(Grid):
         if not change_border_color and self.border_color is not None:
             self.color_border(self.border_color)
 
-    # if self.title is not None:
-    #     for i, char in enumerate(" " + self.title + " "):
-    #         self[Coord(0, i + 2)] = Cell(char, self.title_color, True)
+        self._add_titles()
 
 
 def get_centered_box(center_of: tuple[int, int], size: tuple[int, int]) -> slice:
@@ -294,8 +300,19 @@ def get_centered_box(center_of: tuple[int, int], size: tuple[int, int]) -> slice
 
 
 from pyframe.border.border_type import Thickness
+from pyframe.colors import Colors
 
-f1 = Frame.box(4, 9, BorderTypes.Thin.ROUND)
+
+f1 = Frame.box(12, 12, BorderTypes.OverlapClassic.DOUBLE)
+f1.add_title(
+    Title(
+        "hello",
+        color=Colors.BLUE,
+        alignment=Alignment.RIGHT,
+        title_side=TitleSide.LEFT,
+    )
+)
+f1.color_border(Colors.RED)
 print(f1)
 
 f2 = Frame.box(4, 9, BorderTypes.Thin.SHARP)
@@ -316,6 +333,7 @@ f4 = Frame.box(4, 9, BorderTypes.DOUBLE)
 print(f4)
 
 f5 = Frame.centered("abcdef\nghij", 6, 12, BorderTypes.THICK)
+f5.color_border(Colors.RED)
 print(f5)
 
 f = Frame.box(15, 30, BorderTypes.Thin.ROUND)
@@ -324,7 +342,8 @@ f.add_frame(f2, (0, 12))
 f.add_frame(f4, (2, 14))
 f.add_frame(f3, (6, 12))
 f.add_frame(f5, (9, 15))
-print(f)
+print(f.colored_str())
+print(f[(2, 2)].color.name)
 # f = Frame.box(6, 10)
 # f.add_title(Title("SO", Alignment.CENTER, Colors.BLUE))
 # f.add_frame(Frame.box(4, 5), (1, 0))

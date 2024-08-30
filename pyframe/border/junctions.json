@@ -65,7 +65,9 @@
           "default": "│",
           "triple_dash": "┆",
           "quad_dash": "┊",
-          "duo_dash": "╎"
+          "duo_dash": "╎",
+          "classic_dash": "|",
+          "classic": "|"
         },
         "double": "╞"
       },
@@ -147,7 +149,8 @@
           "triple_dash": "┄",
           "quad_dash": "┈",
           "duo_dash": "╌",
-          "dip_down": "⍽"
+          "dip_down": "⍽",
+          "classic_dash": "-"
         },
         "none": "╴"
       },
@@ -155,7 +158,7 @@
         "thick": "╺",
         "thin": "╶"
       },
-      "double": { "double": "═" }
+      "double": { "double": {"default": "═", "classic": "="} }
     },
     "double": {
       "thin": {

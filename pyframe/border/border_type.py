@@ -1,5 +1,5 @@
 from copy import copy
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Optional
 
 from pyframe.border.junction import Junction
@@ -14,8 +14,6 @@ class BorderPattern:
     >>> BorderPattern.from_string('-+') * 5
     "-+-+-'
     ```
-
-    `from_string` is the easiest constructor.
     """
 
     def __init__(self, *pattern: Junction | Cell) -> None:
@@ -51,6 +49,9 @@ class BorderType:
     bottom_horizontal: BorderJunctions
     right_vertical: BorderJunctions
 
+    title_left: Optional[str] 
+    title_right: Optional[str]
+
     @classmethod
     def thickness(
         cls,
@@ -70,6 +71,8 @@ class BorderType:
         thickness: Optional[Thickness] = None,
         style: Optional[str] = None,
         corner_style: Optional[str] = None,
+        title_left: Optional[str] = None,
+        title_right: Optional[str] = None,
     ):
         """
         #### Thickness (cannot be None if `thickness` argument is None)
@@ -77,7 +80,7 @@ class BorderType:
         - `bottom` -> the thickness of the bottom of the border
         - `left` -> the thickness of the left side of the border
         - `right` -> the thickness of the right side of the border
-        
+
         - `thickness` overrides all of the arguments above that are `None`.
 
         #### Style
@@ -85,7 +88,7 @@ class BorderType:
         - `bottom_style` -> the style of the bottom of the border
         - `left_style` -> the style of the left side of the border
         - `right_style` -> the style of the right side of the border
-        
+
         - `style` overrides all of the arguments above that are `None`.
 
         #### Corner Style
@@ -93,9 +96,9 @@ class BorderType:
         - `top_left_style` -> the style of the top left corner
         - `bottom_right_style` -> the style of the bottom right corner
         - `bottom_left_style` -> the style of the bottom left corner
-        
+
         - `corner_style` overrides all of the arguments above that are `None`.
-        
+
         (corners thickness automatically assigned)
         """
         if style:
@@ -107,6 +110,8 @@ class BorderType:
                 left_style = style
             if right_style == "default":
                 right_style = style
+            if not corner_style:
+                corner_style = style
         if corner_style:
             if top_right_style == "default":
                 top_right_style = corner_style
@@ -155,6 +160,8 @@ class BorderType:
             right_vertical=Junction(
                 {Direction.UP: right, Direction.DOWN: right}, right_style
             ),
+            title_left=title_left,
+            title_right=title_right,
         )
 
     def set_vertical_style(self, vertical: str):

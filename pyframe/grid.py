@@ -1,4 +1,4 @@
-from typing import Generator, Self, overload
+from typing import Generator, Self, overload, Optional
 
 from pyframe.colors import Color, Colors
 from pyframe.types_ import Alignment
@@ -10,13 +10,13 @@ class Cell:
     def __init__(
         self,
         value: str,
-        color: Color = Colors.DEFAULT,
+        color: Optional[Color] = Colors.DEFAULT,
     ) -> None:
         if len(value) > 1:
             raise ValueError("value more than 1 character. use `BorderPattern`")
 
         self.value = value
-        self.color = color
+        self.color = color or Colors.DEFAULT
 
     def update(self, cell: Self):
         self.value = cell.value
@@ -191,7 +191,7 @@ class Grid:
             return self._cells[item]
 
     @overload
-    def __setitem__(self, slice_: slice, matrix: Self, /) -> None: ...
+    def __setitem__(self, slice_: slice, matrix: "Grid", /) -> None: ...
 
     @overload
     def __setitem__(self, index: int, row: list[Cell], /) -> None: ...

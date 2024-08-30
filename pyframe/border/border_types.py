@@ -35,8 +35,8 @@ class BorderTypes:
         Dashed: "type[_Dashed]"
         Castle: "type[_Castle]"
 
-    class Classic:
-        PLUS = BorderType(
+    class OverlapClassic:
+        DASHED = BorderType(
             top_right="+",
             top_left="+",
             bottom_right="+",
@@ -45,6 +45,20 @@ class BorderTypes:
             left_vertical="|",
             bottom_horizontal="-",
             right_vertical="|",
+            title_left="-",
+            title_right="-",
+        )
+        DOUBLE = BorderType(
+            top_right="+",
+            top_left="+",
+            bottom_right="+",
+            bottom_left="+",
+            top_horizontal="=",
+            left_vertical="|",
+            bottom_horizontal="=",
+            right_vertical="|",
+            title_left="=",
+            title_right="=",
         )
         UNDERSCORE = BorderType(
             top_right=" ",
@@ -55,6 +69,20 @@ class BorderTypes:
             left_vertical="|",
             bottom_horizontal="_",
             right_vertical="|",
+            title_left="_",
+            title_right="_",
+        )
+        OVERSCORE = BorderType(
+            top_right="|",
+            top_left="|",
+            bottom_right=" ",
+            bottom_left=" ",
+            top_horizontal="‾",
+            left_vertical="|",
+            bottom_horizontal="‾",
+            right_vertical="|",
+            title_left="‾",
+            title_right="‾",
         )
 
     ThickDashed: "type[_ThickDashed]"

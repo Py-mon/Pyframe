@@ -42,7 +42,7 @@ class Color:
 
 class Colors:
     BLACK = Color.from_hex("BLACK", "#090300")
-    DEFAULT = Color.from_hex("DEFAULT", "#d3d3d3")
+    DEFAULT = Color.from_hex("DEFAULT", "#d0d0d0")
     BLUE = Color.from_hex("BLUE", "#01A0E4")
     GRAY = Color.from_hex("GRAY", "#5C5855")
     CYAN = Color.from_hex("CYAN", "#B5E4F4")

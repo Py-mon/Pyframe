@@ -2,6 +2,7 @@ from typing import Generator, Self, overload, Optional
 
 from pyframe.colors import Color, Colors
 from pyframe.types_ import Alignment
+from pyframe.vector import VectorYX, VectorLike
 
 
 class Cell:
@@ -61,37 +62,6 @@ class Cell:
     # def __copy__(self):
     #     return Cell(self.value, self.color)
 
-
-def add_positions(*tups: tuple[int, int]):
-    y, x = tups[0]
-    for tup in tups[1:]:
-        y += tup[0]
-        x += tup[1]
-    return y, x
-
-
-def sub_positions(*tups: tuple[int, int]):
-    y, x = tups[0]
-    for tup in tups[1:]:
-        y -= tup[0]
-        x -= tup[1]
-    return y, x
-
-
-def add_int_positions(int_, *ints: int):
-    y, x = int_
-    for int_ in ints:
-        y += int_
-        x += int_
-    return y, x
-
-
-def add_y_from(tup, y):
-    return tup[0] + y, tup[1]
-
-
-def add_x_from(tup, x):
-    return tup[0], tup[1] + x
 
 
 class Grid:
@@ -215,6 +185,9 @@ class Grid:
                 (item.start[0] + new_cells.height - 1),
                 (item.start[1] + new_cells.width - 1),
             )
+            
+            if start_x < 0 or start_y < 0:
+                raise IndexError("cannot be negative")
 
             for i in range(start_y, stop_y + 1):
                 # self._cells[start_y : stop_y + 1][i][start_x : stop_x + 1] = new_cells[
@@ -225,33 +198,21 @@ class Grid:
             #     print(new_cells[i], row, row[start_x : stop_x + 1])
             #     row[start_x : stop_x + 1] = new_cells[i]
 
-    def overlay_from_top_left(self, m: Self, pos: tuple[int, int]) -> None:
-        self[pos : add_int_positions(add_positions(pos, m.size), -1)] = m
+    def overlay_from_top_left(self, m: "Grid", pos: VectorLike) -> None:
+        self[pos:] = m
 
-    def overlay_from_bottom_right(self, m: Self, pos: tuple[int, int]) -> None:
-        self[add_int_positions(sub_positions(pos, m.size), 1) : pos] = m
+    def overlay_from_bottom_right(self, m: "Grid", pos: VectorLike) -> None:
+        self[VectorYX(pos) - VectorYX(m.size) :] = m
 
-    def overlay_from_bottom_left(self, m: Self, pos: tuple[int, int]) -> None:
-        self[add_y_from(pos, -(m.height - 1)) : add_x_from(pos, m.width + 1)] = m
+    def overlay_from_bottom_left(self, m: "Grid", pos: VectorLike) -> None:
+        self[VectorYX(pos) - VectorYX(m.height, 0) :] = m
 
-    def overlay_from_top_right(self, m: Self, pos: tuple[int, int]) -> None:
-        self[add_x_from(pos, -(m.width - 1)) : add_y_from(pos, m.height + 1)] = m
-
-    # def overlay_from_top_left(self, m: "Grid", pos: Coord) -> None:
-    #     self[pos : pos + m.size - 1] = m
-
-    # def overlay_from_bottom_right(self, m: "Grid", pos: Coord) -> None:
-    #     self[pos - m.size + 1 : pos] = m
-
-    # def overlay_from_bottom_left(self, m: "Grid", pos: Coord) -> None:
-    #     self[pos.sub_y(m.size.height - 1) : pos.add_x(m.size.width + 1)] = m
-
-    # def overlay_from_top_right(self, m: "Grid", pos: Coord) -> None:
-    #     self[pos.sub_x(m.size.width - 1) : pos.add_y(m.size.height + 1)] = m
+    def overlay_from_top_right(self, m: "Grid", pos: VectorLike) -> None:
+        self[VectorYX(pos) - VectorYX(0, m.width) :] = m
 
     @property
     def rows(self):
-        """The same as `self.cells` (for readability in for loops: `for row in matrix"""
+        """The same as `self.cells` (for readability in for loops: `for row in rows`"""
         return self._cells
 
     def __str__(self) -> str:

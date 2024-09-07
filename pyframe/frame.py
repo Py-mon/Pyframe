@@ -7,8 +7,9 @@ from pyframe.border.border_type import Border, BorderPattern, BorderType
 from pyframe.border.border_types import BorderTypes
 from pyframe.border.junction import Junction
 from pyframe.colors import Color, Colors
-from pyframe.grid import Cell, Grid, add_int_positions, add_positions
+from pyframe.grid import Cell, Grid
 from pyframe.types_ import Alignment, Direction, JunctionDict, TitleSide
+from pyframe.vector import VectorLike, VectorYX
 
 
 @dataclass
@@ -85,7 +86,7 @@ class Frame(Grid):
         aligned_text = Grid(
             [[Cell(cell) for cell in row] for row in text.split("\n")], alignment
         )
-        slice_ = get_centered_box(frame.size, add_int_positions(aligned_text.size, -1))
+        slice_ = get_centered_box(frame.size, VectorYX(aligned_text.size) - 1)
 
         frame[slice_] = aligned_text
 
@@ -130,9 +131,7 @@ class Frame(Grid):
 
     def color_inner(self, color: Color):
         self.base_color = color
-        self.color(
-            self.base_color, rect_range(add_int_positions(self.size, -2), (1, 1))
-        )
+        self.color(self.base_color, rect_range(VectorYX(self.size) - 2, (1, 1)))
 
     def color_border(self, color: Color):
         self.border_color = color
@@ -145,7 +144,7 @@ class Frame(Grid):
         title_left = self.border_type.title_left or "╴"
 
         for title in self.titles:
-            
+
             matrix = Grid(
                 [
                     [Cell(title_left, color=self.border_color)]
@@ -166,20 +165,21 @@ class Frame(Grid):
             )
 
             start_pos = pos - 1
-            end_pos = pos + len(title.title)
 
             if title.title_side == TitleSide.LEFT:
-                self[(start_pos, 0):(end_pos, 0)] = Grid(list(map(list, zip(*matrix._cells))))
+                self[(start_pos, 0):] = Grid(list(map(list, zip(*matrix._cells))))
             elif title.title_side == TitleSide.RIGHT:
-                self[(start_pos, -1):(start_pos, -1)] = Grid(list(map(list, zip(*matrix._cells))))
+                self[(start_pos, self.width - 1) :] = Grid(
+                    list(map(list, zip(*matrix._cells)))
+                )
             elif title.title_side == TitleSide.TOP:
-                self[(0, start_pos):(0, start_pos)] = matrix
+                self[(0, start_pos):] = matrix
             elif title.title_side == TitleSide.BOTTOM:
-                self[(-1, start_pos):(-1, start_pos)] = matrix
+                self[(self.height - 1, start_pos) :] = matrix
 
     def unborder(self):
         """Remove the border."""
-        self._cells = self[(1, 1) : add_int_positions(self.size, -2)]._cells
+        self._cells = self[(1, 1) : VectorYX(self.size) - 2]._cells
 
     def add_title(self, title: Title) -> None:  # make titles better
         self.titles.append(title)
@@ -248,7 +248,7 @@ class Frame(Grid):
 
         def combine_junctions(coords, remove_direction=None):
             for coord in coords:
-                coord_pos = add_positions(coord, pos)
+                coord_pos = VectorYX(coord) + VectorYX(pos)
 
                 self_junction = self[coord_pos]
                 frame_junction = frame[coord]
@@ -271,7 +271,8 @@ class Frame(Grid):
         combine_junctions(frame.right_coords, Direction.LEFT)
         combine_junctions(frame.corner_coords)
 
-        self.overlay_from_top_left(frame, pos)
+        # self.overlay_from_top_left(frame, pos)
+        self.overlay_from_top_right(frame, pos)
 
         for junction, coord in junctions:
             self[coord] = junction
@@ -309,7 +310,7 @@ f1.add_title(
         "hello",
         color=Colors.BLUE,
         alignment=Alignment.RIGHT,
-        title_side=TitleSide.LEFT,
+        title_side=TitleSide.BOTTOM,
     )
 )
 f1.color_border(Colors.RED)
@@ -337,11 +338,11 @@ f5.color_border(Colors.RED)
 print(f5)
 
 f = Frame.box(15, 30, BorderTypes.Thin.ROUND)
-f.add_frame(f1, (2, 0))
-f.add_frame(f2, (0, 12))
-f.add_frame(f4, (2, 14))
-f.add_frame(f3, (6, 12))
-f.add_frame(f5, (9, 15))
+f.add_frame(f1, (2, 12))
+# f.add_frame(f2, (0, 12))
+# f.add_frame(f4, (2, 14))
+# f.add_frame(f3, (6, 12))
+# f.add_frame(f5, (9, 15))
 print(f.colored_str())
 print(f[(2, 2)].color.name)
 # f = Frame.box(6, 10)

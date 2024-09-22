@@ -63,7 +63,6 @@ class Cell:
     #     return Cell(self.value, self.color)
 
 
-
 class Grid:
     def __init__(
         self,
@@ -140,7 +139,11 @@ class Grid:
     @overload
     def __getitem__(self, coord: tuple[int, int], /) -> Cell: ...
 
+    @overload
+    def __getitem__(self, vector: VectorLike, /) -> Cell: ...
+
     def __getitem__(self, item, /):
+
         if isinstance(item, tuple):
             return self._cells[item[0]][item[1]]
 
@@ -185,18 +188,12 @@ class Grid:
                 (item.start[0] + new_cells.height - 1),
                 (item.start[1] + new_cells.width - 1),
             )
-            
+
             if start_x < 0 or start_y < 0:
                 raise IndexError("cannot be negative")
 
             for i in range(start_y, stop_y + 1):
-                # self._cells[start_y : stop_y + 1][i][start_x : stop_x + 1] = new_cells[
-                #     i - start_y
                 self._cells[i][start_x : stop_x + 1] = new_cells[i - start_y]
-
-            # for i, row in enumerate(self._cells[start_y : stop_y + 1]):
-            #     print(new_cells[i], row, row[start_x : stop_x + 1])
-            #     row[start_x : stop_x + 1] = new_cells[i]
 
     def overlay_from_top_left(self, m: "Grid", pos: VectorLike) -> None:
         self[pos:] = m
@@ -242,6 +239,7 @@ class Grid:
 
         return "".join(x)[:-1] + f"\033[0m"
 
+    # Sprites
     # def remove_whitespace_sides(self):
     #     matrix = list(self.cells)
     #     while all(row[1].value == " " for row in matrix):

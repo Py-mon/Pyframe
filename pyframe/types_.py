@@ -1,7 +1,4 @@
-from collections.abc import Iterable, Sequence
 from enum import Enum
-from itertools import chain
-from typing import TYPE_CHECKING, Any, Self, Sized, TypeAlias, TypeVar, Union
 
 
 class Direction(Enum):
@@ -40,13 +37,6 @@ class TitleSide(Enum):
 class Side(Enum):
     LEFT = 0
     RIGHT = -1
-
-
-class CardinalDirection(Enum):
-    NORTH = 0
-    WEST = 1
-    EAST = 2
-    SOUTH = 3
 
 
 class Thickness(Enum):

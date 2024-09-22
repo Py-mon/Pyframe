@@ -1,15 +1,17 @@
-from copy import copy, deepcopy
 from dataclasses import dataclass
 from math import ceil
-from typing import Any, Callable, Optional, Self
+from typing import Self
 
 from pyframe.border.border_type import Border, BorderPattern, BorderType
 from pyframe.border.border_types import BorderTypes
 from pyframe.border.junction import Junction
 from pyframe.colors import Color, Colors
 from pyframe.grid import Cell, Grid
-from pyframe.types_ import Alignment, Direction, JunctionDict, TitleSide
-from pyframe.vector import VectorLike, VectorYX
+from pyframe.types_ import Alignment, Direction, TitleSide
+from pyframe.vector import VectorYX
+
+
+# TODO game package -> sprites, ui package -> scroll wheel mouse inputs buttons etc
 
 
 @dataclass

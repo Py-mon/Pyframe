@@ -49,7 +49,7 @@ class BorderType:
     bottom_horizontal: BorderJunctions
     right_vertical: BorderJunctions
 
-    title_left: Optional[str] 
+    title_left: Optional[str]
     title_right: Optional[str]
 
     @classmethod

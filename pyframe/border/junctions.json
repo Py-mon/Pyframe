@@ -140,7 +140,8 @@
           "duo_dash": "╍"
         },
         "thin": "╾",
-        "none": "╸"
+        "none": "╸",
+        "double": " "
       },
       "thin": {
         "thick": "╼",
@@ -152,13 +153,18 @@
           "dip_down": "⍽",
           "classic_dash": "-"
         },
-        "none": "╴"
+        "none": "╴",
+        "double": " "
       },
       "none": {
         "thick": "╺",
-        "thin": "╶"
+        "thin": "╶",
+        "double": " "
       },
-      "double": { "double": {"default": "═", "classic": "="} }
+      "double": {
+        "double": { "default": "═", "classic": "=" },
+        "none": " "
+      }
     },
     "double": {
       "thin": {

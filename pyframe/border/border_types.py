@@ -36,8 +36,10 @@ class BorderTypes:
             left_vertical="|",
             bottom_horizontal="-",
             right_vertical="|",
-            title_left="-",
-            title_right="-",
+            title_right_top="-",
+            title_left_bottom="-",
+            title_left_top="-",
+            title_right_bottom="-",
         )
         DOUBLE = BorderType(
             top_right="+",
@@ -48,8 +50,10 @@ class BorderTypes:
             left_vertical="|",
             bottom_horizontal="=",
             right_vertical="|",
-            title_left="=",
-            title_right="=",
+            title_right_top="=",
+            title_left_bottom="=",
+            title_left_top="=",
+            title_right_bottom="=",
         )
         UNDERSCORE = BorderType(
             top_right=" ",
@@ -60,8 +64,10 @@ class BorderTypes:
             left_vertical="|",
             bottom_horizontal="_",
             right_vertical="|",
-            title_left="_",
-            title_right="_",
+            title_right_top="_",
+            title_left_bottom="_",
+            title_left_top="_",
+            title_right_bottom="_",
         )
         OVERSCORE = BorderType(
             top_right="|",
@@ -72,8 +78,10 @@ class BorderTypes:
             left_vertical="|",
             bottom_horizontal="‾",
             right_vertical="|",
-            title_left="‾",
-            title_right="‾",
+            title_right_top="‾",
+            title_left_bottom="‾",
+            title_left_top="‾",
+            title_right_bottom="‾",
         )
 
     ThickDashed: "type[_ThickDashed]"

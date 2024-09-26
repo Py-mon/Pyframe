@@ -69,7 +69,9 @@ class Junction(Cell):
 
     @classmethod
     def from_string(cls, string: str):
-        def get_path(nested_dict, value, pre=()) -> tuple[str, str, str, str, str] | None:
+        def get_path(
+            nested_dict, value, pre=()
+        ) -> tuple[str, str, str, str, str] | None:
             for k, v in nested_dict.items():
                 path = pre + (k,)
                 if v == value:

@@ -12,7 +12,7 @@ class BorderPattern:
 
     ```
     >>> BorderPattern.from_string('-+') * 5
-    "-+-+-'
+    '-+-+-'
     ```
     """
 
@@ -28,6 +28,7 @@ class BorderPattern:
 
 
 BorderJunctions = Junction | str | BorderPattern
+CornerJunction = Junction | str
 
 
 @dataclass
@@ -39,18 +40,20 @@ class BorderType:
     Note: `DOUBLE` and `THICK` aren't compatible thicknesses due to box-drawing character limitations.
     """
 
-    top_right: BorderJunctions
-    top_left: BorderJunctions
-    bottom_right: BorderJunctions
-    bottom_left: BorderJunctions
+    top_right: CornerJunction
+    top_left: CornerJunction
+    bottom_right: CornerJunction
+    bottom_left: CornerJunction
 
     top_horizontal: BorderJunctions
     left_vertical: BorderJunctions
     bottom_horizontal: BorderJunctions
     right_vertical: BorderJunctions
 
-    title_left: Optional[str]
-    title_right: Optional[str]
+    title_left_top: CornerJunction
+    title_right_bottom: CornerJunction
+    title_left_bottom: CornerJunction
+    title_right_top: CornerJunction
 
     @classmethod
     def thickness(
@@ -71,8 +74,6 @@ class BorderType:
         thickness: Optional[Thickness] = None,
         style: Optional[str] = None,
         corner_style: Optional[str] = None,
-        title_left: Optional[str] = None,
-        title_right: Optional[str] = None,
     ):
         """
         #### Thickness (cannot be None if `thickness` argument is None)
@@ -160,8 +161,10 @@ class BorderType:
             right_vertical=Junction(
                 {Direction.UP: right, Direction.DOWN: right}, right_style
             ),
-            title_left=title_left,
-            title_right=title_right,
+            title_left_top=Junction({Direction.LEFT: top}, top_style),
+            title_right_bottom=Junction({Direction.RIGHT: bottom}, bottom_style),
+            title_left_bottom=Junction({Direction.LEFT: bottom}, bottom_style),
+            title_right_top=Junction({Direction.RIGHT: top}, top_style),
         )
 
     def set_vertical_style(self, vertical: str):

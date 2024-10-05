@@ -64,6 +64,44 @@ class Cell:
 
 
 class Grid:
+    # def camera(self) -> Frame:
+    #     """Get a selection of the Map around the player."""
+    #     pos_y, pos_x = self.pos
+    #     range_y, range_x = self.camera_range
+
+    #     size_i = self.size.i
+
+    #     end_y, end_x = (pos_y + range_y, pos_x + range_x)
+    #     start_y, start_x = (max(pos_y - range_y, 0), max(pos_x - range_x, 0))
+
+    #     if start_x == 0:
+    #         end_x += range_x - pos_x
+
+    #     if start_y == 0:
+    #         end_y += range_y - pos_y
+
+    #     if end_x > size_i.x:
+    #         start_x -= end_x - size_i.x
+    #         end_x = size_i.x
+
+    #     if end_y > size_i.y:
+    #         start_y -= end_y - size_i.y
+    #         end_y = size_i.y
+
+    #     start = Coord(start_y, start_x)
+    #     end = Size(end_y, end_x)
+
+    #     camera = Grid(
+    #         tuple(
+    #             tuple(self[coord] for coord in row)
+    #             for row in end.array_rect_range(start)
+    #         )
+    #     )
+
+    #     camera.extend_column(None, -1)
+    #     camera.extend_column()
+
+    #     return Frame(camera.cells)
     def __init__(
         self,
         cells: str | list[list[Cell]],
@@ -108,6 +146,16 @@ class Grid:
             self.width = level_out(self._cells, alignment)
         else:
             self.width = 0
+
+    @classmethod
+    def empty(
+        cls,
+        height: int,
+        width: int,
+    ) -> "Grid":
+        return Grid(
+            [[Cell(" ") for _ in range(width)] for _ in range(height)],
+        )
 
     @property
     def size(self) -> tuple[int, int]:

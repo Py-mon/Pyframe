@@ -3,7 +3,7 @@ from pyframe.border.border_type import BorderPattern, BorderType
 from pyframe.types_ import Thickness
 
 
-class BorderTypes:
+class Borders:
     """
     See docs [link here] for all examples.
 
@@ -105,27 +105,27 @@ def get_dashed_from(parent) -> tuple[BorderType, BorderType, BorderType]:
 
 
 class _Castle:
-    ROUND = copy(BorderTypes.Thin.ROUND)
+    ROUND = copy(Borders.Thin.ROUND)
     ROUND.top_horizontal = BorderPattern.from_string("─⍽")
 
 
-BorderTypes.Castle = _Castle
+Borders.Castle = _Castle
 
 
 class _Dashed:
     class Round:
-        TRIPLE, QUAD, DUO = get_dashed_from(BorderTypes.Thin.ROUND)
+        TRIPLE, QUAD, DUO = get_dashed_from(Borders.Thin.ROUND)
 
     class Sharp:
-        TRIPLE, QUAD, DUO = get_dashed_from(BorderTypes.Thin.SHARP)
+        TRIPLE, QUAD, DUO = get_dashed_from(Borders.Thin.SHARP)
 
 
-BorderTypes.Thin.Dashed = _Dashed
+Borders.Thin.Dashed = _Dashed
 
 
 class _ThickDashed:
-    TRIPLE, QUAD, DUO = get_dashed_from(BorderTypes.THICK)
+    TRIPLE, QUAD, DUO = get_dashed_from(Borders.THICK)
 
 
-BorderTypes.Thin = BorderTypes.Thin
-BorderTypes.ThickDashed = _ThickDashed
+Borders.Thin = Borders.Thin
+Borders.ThickDashed = _ThickDashed

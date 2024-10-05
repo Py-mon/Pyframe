@@ -3,12 +3,13 @@ from typing import Self
 
 from pyframe.colors import Color, Colors
 from pyframe.grid import Cell
-from pyframe.types_ import Direction, JunctionDict, Thickness
+from pyframe.types_ import Direction, Thickness
 
 # TABLE[UP][DOWN][LEFT][RIGHT] -> Junction string
 TABLE = load(open(r"pyframe\border\junctions.json", encoding="utf-8"))
 DIRECTION_ORDER = [Direction.UP, Direction.DOWN, Direction.LEFT, Direction.RIGHT]
 
+JunctionDict = dict[Direction, Thickness]
 
 class Junction(Cell):
     """A `Cell` that is a part of a border of a `Frame`."""

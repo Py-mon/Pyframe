@@ -1,6 +1,6 @@
 # Dynamic Boxes
 
-from pyframe.border.border_types import BorderTypes
+from pyframe.border.border_types import Borders
 from pyframe.frame import Frame, Title
 
 from pyframe.border.border_type import BorderType, Thickness

@@ -25,7 +25,13 @@ class Alignment(Enum):
         elif self == type(self).CENTER or self == type(self).MIDDLE:
             return string.center(width)
         return ""
-
+    
+    
+class VerticalAlignment(Enum):
+    CENTER = 0
+    UP = 1
+    DOWN = 2
+    
 
 class TitleSide(Enum):
     TOP = 0
@@ -43,6 +49,3 @@ class Thickness(Enum):
     THIN = "thin"
     THICK = "thick"
     DOUBLE = "double"
-
-
-JunctionDict = dict[Direction, Thickness]

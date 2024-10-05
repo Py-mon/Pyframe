@@ -3,13 +3,14 @@ from math import ceil
 from typing import Self
 
 from pyframe.border.border_type import Border, BorderPattern, BorderType
-from pyframe.border.border_types import BorderTypes
+from pyframe.border.border_types import Borders
 from pyframe.border.junction import Junction
 from pyframe.colors import Color, Colors
 from pyframe.grid import Cell, Grid
 from pyframe.types_ import Alignment, Direction, TitleSide
 from pyframe.vector import VectorYX
 
+from typing import overload
 
 # TODO game package -> sprites, ui package -> scroll wheel mouse inputs buttons etc
 
@@ -62,59 +63,52 @@ def rect_range(stop, start=None) -> list[tuple[int, int]]:
 
 class Frame(Grid):
     @classmethod
-    def centered(
-        cls,
-        text: str,
-        height: int,
-        width: int,
-        border_type: BorderType = BorderTypes.Thin.ROUND,
-        alignment: Alignment = Alignment.CENTER,
-    ) -> Self:
-        """
-        ```
-        >>> Frame.centered("abcdef\\nghij")
-        ╭──────────╮
-        │          │
-        │  abcdef  │
-        │   ghij   │
-        │          │
-        ╰──────────╯
-        """
-        frame = cls(
-            [[Cell(" ") for _ in range(width - 2)] for _ in range(height - 2)],
-            border_type,
-        )
-
-        aligned_text = Grid(
-            [[Cell(cell) for cell in row] for row in text.split("\n")], alignment
-        )
-        slice_ = get_centered_box(frame.size, VectorYX(aligned_text.size) - 1)
-
-        frame[slice_] = aligned_text
-
-        return frame
-
-    @classmethod
-    def box(
+    def empty_box(
         cls,
         height: int,
         width: int,
-        border_type: BorderType = BorderTypes.Thin.ROUND,
-    ) -> Self:
-        frame = cls(
+        border_type: BorderType = Borders.Thin.ROUND,
+    ) -> "Frame":
+        """Includes border"""
+        frame = Frame(
             [[Cell(" ") for _ in range(width - 2)] for _ in range(height - 2)],
             border_type,
         )
         if height == 2:
             frame.width = width - 2
             frame.border()
+
         return frame
 
+    @classmethod
+    def map_text(
+        cls,
+        text: str,
+        border_type: BorderType = Borders.Thin.ROUND,
+    ) -> Self:
+        return cls(
+            [[Cell(char) for char in row] for row in text.splitlines()], border_type
+        )
+
+    @overload
+    def __init__(self, grid: Grid, border_type: BorderType = Borders.Thin.ROUND, /): ...
+
+    @overload
     def __init__(
         self,
         cells: list[list[Cell]],
-        border_type: BorderType = BorderTypes.Thin.ROUND,
+        border_type: BorderType = Borders.Thin.ROUND,
+        /,
+    ): ...
+
+    def __init__(
+        self,
+        cells: list[list[Cell]] | Grid,
+        border_type: BorderType = Borders.Thin.ROUND,
     ) -> None:
+        if isinstance(cells, Grid):
+            cells = cells._cells
+
         super().__init__(cells)
 
         self.titles: list[Title] = []
